@@ -17,4 +17,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="invalidPhone">Invalid phone</string>
+    <string name="requiredField">Required field</string>
+    <string name="errorOccured">Some errors occured</string>
+    <string name="invalidCode">Invalid code</string>
 </resources>

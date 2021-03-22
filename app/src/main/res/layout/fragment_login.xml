@@ -73,7 +73,7 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/next"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -115,13 +115,27 @@
                     android:text="@string/loginDetails"
                     android:textColor="@color/textGray" />
 
+                <TextView
+                    android:id="@+id/error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textError"
+                    android:visibility="gone" />
+
                 <EditText
-                    android:id="@+id/editText"
+                    android:id="@+id/et_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/enterPhone"
-                    android:inputType="textPersonName" />
+                    android:inputType="phone" />
+
+                <FrameLayout
+                    android:id="@+id/codeInputContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </FrameLayout>
 
             </LinearLayout>
 

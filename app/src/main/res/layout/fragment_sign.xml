@@ -80,7 +80,7 @@
                     android:fontFamily="sans-serif-condensed-medium"
                     android:text="@string/next"
                     android:textAlignment="textEnd"
-                    android:textColor="@color/textWhite"
+                    android:textColor="@color/textGray"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -116,7 +116,7 @@
                     android:textColor="@color/textGray" />
 
                 <EditText
-                    android:id="@+id/editText"
+                    android:id="@+id/et_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"

@@ -80,7 +80,7 @@
                     android:fontFamily="sans-serif-condensed-medium"
                     android:text="@string/next"
                     android:textAlignment="textEnd"
-                    android:textColor="@color/textWhite"
+                    android:textColor="@color/textGray"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
