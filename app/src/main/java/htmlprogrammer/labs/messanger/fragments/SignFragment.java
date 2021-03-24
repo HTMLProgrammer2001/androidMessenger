@@ -5,22 +5,36 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.basgeekball.awesomevalidation.AwesomeValidation;
+import com.basgeekball.awesomevalidation.ValidationStyle;
+import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SignFragment extends Fragment {
+    private EditText nameEdit, nickEdit, phoneEdit;
+    private FrameLayout codeInputContainer;
+    private TextView back, error, nextButton;
 
+    private AwesomeValidation validation;
+    private boolean isCodeStep = false;
+    private CodeInputFragment codeInputFragment;
 
-    public SignFragment() {
-        // Required empty public constructor
-    }
+    public SignFragment() { }
 
 
     @Override
@@ -34,7 +48,97 @@ public class SignFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView back = view.findViewById(R.id.back);
+        back = view.findViewById(R.id.back);
+        error = view.findViewById(R.id.error);
+        nameEdit = view.findViewById(R.id.et_name);
+        nickEdit = view.findViewById(R.id.et_nick);
+        phoneEdit = view.findViewById(R.id.et_phone);
+        codeInputContainer = view.findViewById(R.id.codeInputContainerSign);
+        nextButton = view.findViewById(R.id.next);
+
+        createCodeInput();
+        activateLinks();
+        addValidation();
+    }
+
+    private void createCodeInput(){
+        //create code input
+        codeInputFragment = new CodeInputFragment();
+
+        codeInputFragment.setCancelCb(() -> {
+            isCodeStep = false;
+            codeInputContainer.setVisibility(View.GONE);
+
+            phoneEdit.setEnabled(true);
+            nameEdit.setEnabled(true);
+            nickEdit.setEnabled(true);
+        });
+
+        codeInputFragment.setResendCb(() -> {
+            Toast.makeText(getContext(), "Resend", Toast.LENGTH_SHORT).show();
+        });
+
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .add(R.id.codeInputContainerSign, codeInputFragment, null)
+                .addToBackStack("codeInput")
+                .commit();
+
+        codeInputContainer.setVisibility(View.GONE);
+    }
+
+    private void activateLinks(){
         back.setOnClickListener((e) -> getActivity().getSupportFragmentManager().popBackStack());
+    }
+
+    private void addValidation(){
+        validation = new AwesomeValidation(ValidationStyle.BASIC);
+
+        //add required validation
+        validation.addValidation(nameEdit, RegexTemplate.NOT_EMPTY, "Required field");
+        validation.addValidation(phoneEdit, RegexTemplate.NOT_EMPTY, "Required field");
+        validation.addValidation(nickEdit, RegexTemplate.NOT_EMPTY, "Required field");
+
+        validation.addValidation(phoneEdit, Patterns.PHONE, "Invalid phone format");
+        validation.addValidation(nickEdit, "[a-zA-Z]\\w{3,31}", "Nick must be from 4 to 32 symbols and start with latin letter");
+
+        nextButton.setOnClickListener(view -> {
+            if(!isCodeStep)
+                nextStepOne();
+            else
+                nextStepTwo();
+        });
+    }
+
+    private void nextStepOne(){
+        if(validation.validate()) {
+            //TODO: make api call
+            isCodeStep = true;
+
+            phoneEdit.setEnabled(false);
+            nameEdit.setEnabled(false);
+            nickEdit.setEnabled(false);
+
+            codeInputContainer.setVisibility(View.VISIBLE);
+            error.setVisibility(View.GONE);
+        }
+        else{
+            //show error
+            error.setText(getString(R.string.errorOccured));
+            error.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void nextStepTwo(){
+        if(codeInputFragment.validate()){
+            //TODO: make api call
+            error.setVisibility(View.GONE);
+        }
+        else {
+            error.setText(getString(R.string.errorOccured));
+            error.setVisibility(View.VISIBLE);
+        }
     }
 }

@@ -73,14 +73,14 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/next"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-condensed-medium"
                     android:text="@string/next"
                     android:textAlignment="textEnd"
-                    android:textColor="@color/textGray"
+                    android:textColor="@color/textWhite"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -115,29 +115,43 @@
                     android:text="@string/loginDetails"
                     android:textColor="@color/textGray" />
 
+                <TextView
+                    android:id="@+id/error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textError"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/enterName"
+                    android:id="@+id/et_name"
+                    android:inputType="textPersonName" />
+
                 <EditText
                     android:id="@+id/et_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="@string/enterName"
-                    android:inputType="textPersonName" />
-
-                <EditText
-                    android:id="@+id/oldPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="@string/enterPhone"
-                    android:inputType="textPersonName" />
+                    android:inputType="phone" />
 
                 <EditText
-                    android:id="@+id/editText3"
+                    android:id="@+id/et_nick"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/enterNick"
                     android:inputType="textPersonName" />
+
+                <FrameLayout
+                    android:id="@+id/codeInputContainerSign"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </FrameLayout>
 
             </LinearLayout>
 
