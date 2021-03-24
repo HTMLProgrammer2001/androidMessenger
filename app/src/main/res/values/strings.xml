@@ -9,16 +9,19 @@
     <string name="changePhone">Change phone</string>
 
     <string name="enterPhone">Enter phone</string>
+    <string name="enterOldPhone">Enter old phone</string>
+    <string name="enterNewPhone">Enter new phone</string>
     <string name="enterName">Enter name</string>
     <string name="enterNick">Enter nick</string>
 
     <string name="loginForm">Login</string>
     <string name="loginDetails">Please enter data in this field</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="invalidPhone">Invalid phone</string>
     <string name="requiredField">Required field</string>
     <string name="errorOccured">Some errors occured</string>
     <string name="invalidCode">Invalid code</string>
+    <string name="invalidNick">Nick must be from 4 to 32 symbols and start with latin letter</string>
+    <string name="notSame">This field must be not same</string>
 </resources>

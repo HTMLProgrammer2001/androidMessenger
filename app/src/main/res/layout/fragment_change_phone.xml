@@ -73,14 +73,14 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/next"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-condensed-medium"
                     android:text="@string/next"
                     android:textAlignment="textEnd"
-                    android:textColor="@color/textGray"
+                    android:textColor="@color/textWhite"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -115,21 +115,42 @@
                     android:text="@string/loginDetails"
                     android:textColor="@color/textGray" />
 
-                <EditText
-                    android:id="@+id/oldPhone"
+                <TextView
+                    android:id="@+id/error"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/enterPhone"
-                    android:inputType="textPersonName" />
+                    android:textColor="@color/textError"
+                    android:visibility="gone" />
 
                 <EditText
-                    android:id="@+id/phone"
+                    android:id="@+id/et_oldPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="@string/enterPhone"
-                    android:inputType="textPersonName" />
+                    android:hint="@string/enterOldPhone"
+                    android:inputType="phone" />
+
+                <EditText
+                    android:id="@+id/et_newPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/enterNewPhone"
+                    android:inputType="phone" />
+
+                <FrameLayout
+                    android:id="@+id/codeInputOld"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/codeInputNew"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </FrameLayout>
 
             </LinearLayout>
 

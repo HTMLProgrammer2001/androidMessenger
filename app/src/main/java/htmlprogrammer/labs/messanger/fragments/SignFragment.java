@@ -90,19 +90,19 @@ public class SignFragment extends Fragment {
     }
 
     private void activateLinks(){
-        back.setOnClickListener((e) -> getActivity().getSupportFragmentManager().popBackStack());
+        back.setOnClickListener((e) -> requireActivity().getSupportFragmentManager().popBackStack());
     }
 
     private void addValidation(){
         validation = new AwesomeValidation(ValidationStyle.BASIC);
 
         //add required validation
-        validation.addValidation(nameEdit, RegexTemplate.NOT_EMPTY, "Required field");
-        validation.addValidation(phoneEdit, RegexTemplate.NOT_EMPTY, "Required field");
-        validation.addValidation(nickEdit, RegexTemplate.NOT_EMPTY, "Required field");
+        validation.addValidation(nameEdit, RegexTemplate.NOT_EMPTY, getString(R.string.requiredField));
+        validation.addValidation(phoneEdit, RegexTemplate.NOT_EMPTY, getString(R.string.requiredField));
+        validation.addValidation(nickEdit, RegexTemplate.NOT_EMPTY, getString(R.string.requiredField));
 
-        validation.addValidation(phoneEdit, Patterns.PHONE, "Invalid phone format");
-        validation.addValidation(nickEdit, "[a-zA-Z]\\w{3,31}", "Nick must be from 4 to 32 symbols and start with latin letter");
+        validation.addValidation(phoneEdit, Patterns.PHONE, getString(R.string.invalidPhone));
+        validation.addValidation(nickEdit, "[a-zA-Z]\\w{3,31}", getString(R.string.invalidNick));
 
         nextButton.setOnClickListener(view -> {
             if(!isCodeStep)
