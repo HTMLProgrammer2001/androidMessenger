@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,8 @@ public class SignFragment extends Fragment {
     private boolean isCodeStep = false;
     private CodeInputFragment codeInputFragment;
 
+    private FragmentManager manager;
+
     public SignFragment() { }
 
 
@@ -47,6 +50,8 @@ public class SignFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        manager = requireActivity().getSupportFragmentManager();
 
         back = view.findViewById(R.id.back);
         error = view.findViewById(R.id.error);
@@ -83,14 +88,13 @@ public class SignFragment extends Fragment {
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputContainerSign, codeInputFragment, null)
-                .addToBackStack("codeInput")
                 .commit();
 
         codeInputContainer.setVisibility(View.GONE);
     }
 
     private void activateLinks(){
-        back.setOnClickListener((e) -> requireActivity().getSupportFragmentManager().popBackStack());
+        back.setOnClickListener(e -> manager.popBackStack());
     }
 
     private void addValidation(){

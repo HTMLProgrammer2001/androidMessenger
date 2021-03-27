@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Messenger</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="next">Next</string>
+    <string name="back">Back</string>
+    <string name="loading">Loading...</string>
     <string name="logo">Logo</string>
     <string name="signin">Sign in</string>
-    <string name="back">Back</string>
     <string name="changePhone">Change phone</string>
 
     <string name="enterPhone">Enter phone</string>

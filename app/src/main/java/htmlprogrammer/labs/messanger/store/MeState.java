@@ -3,6 +3,9 @@ package htmlprogrammer.labs.messanger.store;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import org.json.JSONObject;
+
+import htmlprogrammer.labs.messanger.api.UserActionsAPI;
 import htmlprogrammer.labs.messanger.models.User;
 
 
@@ -20,14 +23,36 @@ public class MeState extends ViewModel {
     }
 
     public void setUser(User user){
-        userData.setValue(user);
+        userData.postValue(user);
     }
 
-    public MutableLiveData<Boolean> isLoading(){
+    public MutableLiveData<Boolean> getLoadingData(){
         return loadingData;
     }
 
-    public void setLoading(Boolean isLoading){
-        loadingData.setValue(isLoading);
+    private void setLoading(Boolean isLoading){
+        loadingData.postValue(isLoading);
+    }
+
+    public void getMe(String token){
+        setLoading(true);
+
+        UserActionsAPI.getMe(token, (err, response) -> {
+            //error in loading
+            if(err != null || !response.isSuccessful()){
+                setLoading(false);
+                return;
+            }
+
+            try {
+                //parse response
+                JSONObject userObj = new JSONObject(response.body().string());
+                setLoading(false);
+                setUser(User.fromJSON(userObj));
+            }
+            catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        });
     }
 }

@@ -70,7 +70,7 @@ public class CodeInputFragment extends Fragment {
         validation = new AwesomeValidation(ValidationStyle.BASIC);
 
         //add rules
-        validation.addValidation(codeInput, "\\d{4}", getString(R.string.invalidCode));
+        validation.addValidation(codeInput, "\\d{8}", getString(R.string.invalidCode));
     }
 
     private void addHandlers(){
@@ -93,6 +93,10 @@ public class CodeInputFragment extends Fragment {
 
     public void setResendCb(ICallable cb){
         resendCb = cb;
+    }
+
+    public String getCode(){
+        return codeInput.getText().toString();
     }
 
     class ResendTask extends TimerTask{

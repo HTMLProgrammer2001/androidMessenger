@@ -1,6 +1,7 @@
 package htmlprogrammer.labs.messanger.fragments;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,8 +19,13 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
+import org.json.JSONObject;
+
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.api.UserActionsAPI;
 import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
+import htmlprogrammer.labs.messanger.models.User;
+import htmlprogrammer.labs.messanger.store.MeState;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,8 +37,10 @@ public class LoginFragment extends Fragment {
     private FrameLayout codeInputContainer;
 
     private CodeInputFragment codeInputFragment;
+    private MeState meState;
 
     private boolean isCodeStep = false;
+    private boolean isLoading = false;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -50,6 +58,8 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        meState = ViewModelProviders.of(requireActivity()).get(MeState.class);
+
         phone = view.findViewById(R.id.et_phone);
         signBtn = view.findViewById(R.id.sign);
         changePhoneBtn = view.findViewById(R.id.changePhone);
@@ -62,7 +72,7 @@ public class LoginFragment extends Fragment {
         addValidation();
     }
 
-    private void createCodeInput(){
+    private void createCodeInput() {
         //create code input
         codeInputFragment = new CodeInputFragment();
 
@@ -81,13 +91,12 @@ public class LoginFragment extends Fragment {
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputContainer, codeInputFragment, null)
-                .addToBackStack("codeInput")
                 .commit();
 
         codeInputContainer.setVisibility(View.GONE);
     }
 
-    private void activateLinks(){
+    private void activateLinks() {
         signBtn.setOnClickListener((v) -> {
             requireActivity()
                     .getSupportFragmentManager()
@@ -109,7 +118,7 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    private void addValidation(){
+    private void addValidation() {
         //init validation
         validation = new AwesomeValidation(ValidationStyle.BASIC);
 
@@ -118,35 +127,78 @@ public class LoginFragment extends Fragment {
         validation.addValidation(phone, Patterns.PHONE, getString(R.string.invalidPhone));
 
         nextBtn.setOnClickListener(view -> {
-            if(!isCodeStep)
+            if (isLoading)
+                return;
+
+            error.setVisibility(View.GONE);
+
+            if (!isCodeStep)
                 nextStepOne();
             else
                 nextStepTwo();
         });
     }
 
-    private void nextStepOne(){
-        if(validation.validate()) {
-            //TODO: make api call
-            isCodeStep = true;
-            phone.setEnabled(false);
-            codeInputContainer.setVisibility(View.VISIBLE);
+    private void nextStepOne() {
+        if (validation.validate()) {
+            isLoading = true;
+            nextBtn.setTextColor(getResources().getColor(R.color.textGray));
 
-            error.setVisibility(View.GONE);
-        }
-        else{
+            UserActionsAPI.login(phone.getText().toString(), (e, response) -> {
+                requireActivity().runOnUiThread(() -> {
+                    if(e == null && response.isSuccessful()){
+                        isCodeStep = true;
+                        phone.setEnabled(false);
+                        codeInputContainer.setVisibility(View.VISIBLE);
+
+                        error.setVisibility(View.GONE);
+                    }
+                    else{
+                        String errorText = e != null ? e.getMessage() : "";
+                        errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+
+                        error.setText(errorText);
+                        error.setVisibility(View.VISIBLE);
+                    }
+
+                    nextBtn.setTextColor(getResources().getColor(R.color.textWhite));
+                    isLoading = false;
+                });
+            });
+        } else {
             //show error
             error.setText(getString(R.string.errorOccured));
             error.setVisibility(View.VISIBLE);
         }
     }
 
-    private void nextStepTwo(){
-        if(codeInputFragment.validate()){
-            //TODO: make api call
-            error.setVisibility(View.GONE);
-        }
-        else {
+    private void nextStepTwo() {
+        if (codeInputFragment.validate()) {
+            isLoading = true;
+            nextBtn.setTextColor(getResources().getColor(R.color.textGray));
+
+            UserActionsAPI.confirmLogin(codeInputFragment.getCode(), (e, response) -> {
+                requireActivity().runOnUiThread(() -> {
+                    if(e == null && response.isSuccessful()){
+                        try {
+                            JSONObject respObj = new JSONObject(response.body().string());
+                            meState.setUser(User.fromJSON(respObj.getJSONObject("user")));
+                        }
+                        catch (Exception err){}
+                    }
+                    else{
+                        String errorText = e != null ? e.getMessage() : "";
+                        errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+
+                        error.setText(errorText);
+                        error.setVisibility(View.VISIBLE);
+                    }
+
+                    nextBtn.setTextColor(getResources().getColor(R.color.textWhite));
+                    isLoading = false;
+                });
+            });
+        } else {
             error.setText(getString(R.string.errorOccured));
             error.setVisibility(View.VISIBLE);
         }

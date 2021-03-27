@@ -91,7 +91,6 @@ public class ChangePhoneFragment extends Fragment {
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputOld, codeInputFragmentOld, null)
-                .addToBackStack("codeInputOld")
                 .commit();
 
         requireActivity()
@@ -99,7 +98,6 @@ public class ChangePhoneFragment extends Fragment {
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputNew, codeInputFragmentNew, null)
-                .addToBackStack("codeInputNew")
                 .commit();
 
         codeInputContainerNew.setVisibility(View.GONE);
