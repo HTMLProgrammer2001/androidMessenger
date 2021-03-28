@@ -99,6 +99,10 @@ public class CodeInputFragment extends Fragment {
         return codeInput.getText().toString();
     }
 
+    public void showError(String error){
+        codeInput.setError(error);
+    }
+
     class ResendTask extends TimerTask{
         @Override
         public void run() {

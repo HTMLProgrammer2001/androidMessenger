@@ -1,14 +1,19 @@
 package htmlprogrammer.labs.messanger;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import org.json.JSONObject;
+
+import htmlprogrammer.labs.messanger.api.UserActionsAPI;
 import htmlprogrammer.labs.messanger.fragments.LoginFragment;
 import htmlprogrammer.labs.messanger.fragments.MainFragment;
 import htmlprogrammer.labs.messanger.fragments.common.Loader;
+import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeState;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,9 +25,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         meState = ViewModelProviders.of(this).get(MeState.class);
-        meState.getMe("");
-        //"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjIzNjMzNDAxMzM0NCIsImlhdCI6MTYxNjgwMDczNX0.fYayY0j4DfNfGSEtoReYqiPb3u5tCFbijkBSnnuTo1I"
+        initMe();
         subscribe();
+    }
+
+    private void initMe() {
+        meState.setLoading(true);
+
+        SharedPreferences prefs = getSharedPreferences("store", 0);
+        UserActionsAPI.getMe(prefs.getString("token", ""), (err, response) -> {
+            //error in loading
+            if (err != null || !response.isSuccessful()) {
+                meState.setLoading(false);
+                return;
+            }
+
+            try {
+                //parse response
+                JSONObject userObj = new JSONObject(response.body().string());
+                meState.setLoading(false);
+                meState.setUser(User.fromJSON(userObj));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
     }
 
     private void subscribe() {
@@ -36,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
                         .replace(R.id.container, new LoginFragment(), null)
                         .addToBackStack("login")
                         .commit();
-            }
-            else{
+            } else {
                 transaction
                         .replace(R.id.container, new MainFragment(), null)
                         .addToBackStack("main")
@@ -46,14 +71,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         meState.getLoadingData().observe(this, isLoading -> {
-            if(isLoading){
+            if (isLoading) {
                 getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.container, new Loader(), null)
                         .addToBackStack("loading")
                         .commit();
-            }
-            else{
+            } else {
                 getSupportFragmentManager().popBackStack("loading", 1);
             }
         });

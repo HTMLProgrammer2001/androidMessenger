@@ -30,29 +30,7 @@ public class MeState extends ViewModel {
         return loadingData;
     }
 
-    private void setLoading(Boolean isLoading){
+    public void setLoading(Boolean isLoading){
         loadingData.postValue(isLoading);
-    }
-
-    public void getMe(String token){
-        setLoading(true);
-
-        UserActionsAPI.getMe(token, (err, response) -> {
-            //error in loading
-            if(err != null || !response.isSuccessful()){
-                setLoading(false);
-                return;
-            }
-
-            try {
-                //parse response
-                JSONObject userObj = new JSONObject(response.body().string());
-                setLoading(false);
-                setUser(User.fromJSON(userObj));
-            }
-            catch (Exception e){
-                System.out.println(e.getMessage());
-            }
-        });
     }
 }

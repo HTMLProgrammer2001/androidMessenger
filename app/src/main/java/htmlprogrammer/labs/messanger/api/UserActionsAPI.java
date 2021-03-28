@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import htmlprogrammer.labs.messanger.BuildConfig;
+import htmlprogrammer.labs.messanger.constants.CodeTypes;
 import htmlprogrammer.labs.messanger.interfaces.APICallback;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -73,5 +74,23 @@ public class UserActionsAPI {
             makeCall(request, callback);
         }
         catch (Exception e){ }
+    }
+
+    public static void resend(String phone, CodeTypes type, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try {
+            data.put("phone", phone);
+            data.put("type", type);
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder()
+                    .url(BuildConfig.API_URL + "/resend")
+                    .post(body)
+                    .build();
+
+            makeCall(request, callback);
+        }
+        catch (Exception e){}
     }
 }
