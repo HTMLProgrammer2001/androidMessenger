@@ -214,6 +214,7 @@ public class LoginFragment extends Fragment {
                 codeInputContainer.setVisibility(View.VISIBLE);
 
                 error.setVisibility(View.GONE);
+                Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
             } else {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";

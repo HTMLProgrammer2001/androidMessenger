@@ -49,11 +49,7 @@ public class UserActionsAPI {
             data.put("phone", phone);
             RequestBody body = RequestBody.create(JSON, data.toString());
 
-            Request request = new Request.Builder()
-                    .url(BuildConfig.API_URL + "/login")
-                    .post(body)
-                    .build();
-
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/login").post(body).build();
             makeCall(request, callback);
         }
         catch (Exception e){ }
@@ -76,6 +72,38 @@ public class UserActionsAPI {
         catch (Exception e){ }
     }
 
+    public static void signIn(String name, String phone, String nick, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try{
+            data.put("name", name);
+            data.put("nickname", nick);
+            data.put("phone", phone);
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/sign").post(body).build();
+            makeCall(request, callback);
+        }
+        catch (Exception e){ }
+    }
+
+    public static void confirmSignIn(String code, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try{
+            data.put("code", code);
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder()
+                    .url(BuildConfig.API_URL + "/confirm/sign")
+                    .post(body)
+                    .build();
+
+            makeCall(request, callback);
+        }
+        catch (Exception e){ }
+    }
+
     public static void resend(String phone, CodeTypes type, APICallback callback){
         JSONObject data = new JSONObject();
 
@@ -84,11 +112,7 @@ public class UserActionsAPI {
             data.put("type", type);
             RequestBody body = RequestBody.create(JSON, data.toString());
 
-            Request request = new Request.Builder()
-                    .url(BuildConfig.API_URL + "/resend")
-                    .post(body)
-                    .build();
-
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/resend").post(body).build();
             makeCall(request, callback);
         }
         catch (Exception e){}

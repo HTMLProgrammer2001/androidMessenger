@@ -1,6 +1,8 @@
 package htmlprogrammer.labs.messanger.fragments;
 
 
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,8 +22,17 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.api.UserActionsAPI;
+import htmlprogrammer.labs.messanger.constants.CodeTypes;
 import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
+import htmlprogrammer.labs.messanger.models.User;
+import htmlprogrammer.labs.messanger.store.MeState;
+import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +46,10 @@ public class SignFragment extends Fragment {
     private boolean isCodeStep = false;
     private CodeInputFragment codeInputFragment;
 
+    private MeState meState;
+
     private FragmentManager manager;
+    private boolean isLoading = false;
 
     public SignFragment() { }
 
@@ -52,6 +66,7 @@ public class SignFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         manager = requireActivity().getSupportFragmentManager();
+        meState = ViewModelProviders.of(requireActivity()).get(MeState.class);
 
         back = view.findViewById(R.id.back);
         error = view.findViewById(R.id.error);
@@ -80,7 +95,9 @@ public class SignFragment extends Fragment {
         });
 
         codeInputFragment.setResendCb(() -> {
-            Toast.makeText(getContext(), "Resend", Toast.LENGTH_SHORT).show();
+            UserActionsAPI.resend(phoneEdit.getText().toString(), CodeTypes.SIGNIN, (e, response) -> {
+                requireActivity().runOnUiThread(() -> onResend(e, response));
+            });
         });
 
         requireActivity()
@@ -106,9 +123,15 @@ public class SignFragment extends Fragment {
         validation.addValidation(nickEdit, RegexTemplate.NOT_EMPTY, getString(R.string.requiredField));
 
         validation.addValidation(phoneEdit, Patterns.PHONE, getString(R.string.invalidPhone));
+        validation.addValidation(nameEdit, "[a-zA-Z]\\w{3,31}", getString(R.string.invalidNick));
         validation.addValidation(nickEdit, "[a-zA-Z]\\w{3,31}", getString(R.string.invalidNick));
 
         nextButton.setOnClickListener(view -> {
+            if(isLoading)
+                return;
+
+            error.setVisibility(View.GONE);
+
             if(!isCodeStep)
                 nextStepOne();
             else
@@ -118,15 +141,14 @@ public class SignFragment extends Fragment {
 
     private void nextStepOne(){
         if(validation.validate()) {
-            //TODO: make api call
-            isCodeStep = true;
+            isLoading = true;
+            nextButton.setTextColor(getResources().getColor(R.color.textGray));
 
-            phoneEdit.setEnabled(false);
-            nameEdit.setEnabled(false);
-            nickEdit.setEnabled(false);
-
-            codeInputContainer.setVisibility(View.VISIBLE);
-            error.setVisibility(View.GONE);
+            UserActionsAPI.signIn(
+                    nameEdit.getText().toString(),
+                    phoneEdit.getText().toString(),
+                    nickEdit.getText().toString(),
+                    (e, response) -> requireActivity().runOnUiThread(() -> onSign(e, response)));
         }
         else{
             //show error
@@ -137,12 +159,118 @@ public class SignFragment extends Fragment {
 
     private void nextStepTwo(){
         if(codeInputFragment.validate()){
-            //TODO: make api call
+            UserActionsAPI.confirmSignIn(codeInputFragment.getCode(), (e, response) -> {
+                requireActivity().runOnUiThread(() -> onConfirmSign(e, response));
+            });
+
             error.setVisibility(View.GONE);
         }
         else {
             error.setText(getString(R.string.errorOccured));
             error.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showErrors(JSONArray array) throws JSONException {
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject errorObject = array.getJSONObject(i);
+
+            if (errorObject.getString("param").equals("phone"))
+                phoneEdit.setError(errorObject.getString("msg"));
+
+            if(errorObject.getString("param").equals("nickname"))
+                nickEdit.setError(errorObject.getString("msg"));
+
+            if(errorObject.getString("param").equals("name"))
+                nameEdit.setError(errorObject.getString("msg"));
+
+            if(errorObject.getString("param").equals("code"))
+                codeInputFragment.showError(errorObject.getString("msg"));
+        }
+    }
+
+    private void onSign(Exception e, Response response){
+        try{
+            if (e == null && response.isSuccessful()) {
+                //next step
+                isCodeStep = true;
+                phoneEdit.setEnabled(false);
+                nameEdit.setEnabled(false);
+                nickEdit.setEnabled(false);
+
+                codeInputContainer.setVisibility(View.VISIBLE);
+
+                error.setVisibility(View.GONE);
+                Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
+            } else {
+                //get error
+                String errorText = e != null ? e.getMessage() : "";
+                errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+
+                //show error
+                error.setText(errorText);
+                error.setVisibility(View.VISIBLE);
+
+                if(response != null)
+                    showErrors(new JSONObject(response.body().string()).getJSONArray("errors"));
+            }
+        }
+        catch (Exception err){
+            //show error
+            error.setText(err.getMessage());
+            error.setVisibility(View.VISIBLE);
+        }
+
+        //stop loading
+        nextButton.setTextColor(getResources().getColor(R.color.textWhite));
+        isLoading = false;
+    }
+
+    private void onResend(Exception e, Response response) {
+        if (e == null && response.isSuccessful()) {
+            Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
+        } else {
+            //get error
+            String errorText = e != null ? e.getMessage() : "";
+            errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+
+            //show error
+            error.setText(errorText);
+            error.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void onConfirmSign(Exception e, Response response){
+        try {
+            //parse response
+            JSONObject respObj = new JSONObject(response.body().string());
+
+            //no errors
+            if (e == null && response.isSuccessful()) {
+                //save user
+                meState.setUser(User.fromJSON(respObj.getJSONObject("user")));
+
+                //save token to store
+                SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();
+                editor.putString("token", respObj.getString("token"));
+                editor.apply();
+            } else {
+                //get error
+                String errorText = e != null ? e.getMessage() : "";
+                errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+
+                //show error
+                error.setText(errorText);
+                error.setVisibility(View.VISIBLE);
+
+                showErrors(respObj.getJSONArray("errors"));
+            }
+        } catch (Exception err) {
+            error.setText(err.getMessage());
+            error.setVisibility(View.VISIBLE);
+        }
+
+        nextButton.setTextColor(getResources().getColor(R.color.textWhite));
+        isLoading = false;
     }
 }
