@@ -95,7 +95,7 @@ public class SignFragment extends Fragment {
         });
 
         codeInputFragment.setResendCb(() -> {
-            UserActionsAPI.resend(phoneEdit.getText().toString(), CodeTypes.SIGNIN, (e, response) -> {
+            UserActionsAPI.resend(phoneEdit.getText().toString(), CodeTypes.SIGNIN.getValue(), (e, response) -> {
                 requireActivity().runOnUiThread(() -> onResend(e, response));
             });
         });
@@ -249,6 +249,7 @@ public class SignFragment extends Fragment {
             if (e == null && response.isSuccessful()) {
                 //save user
                 meState.setUser(User.fromJSON(respObj.getJSONObject("user")));
+                meState.setToken(respObj.getString("token"));
 
                 //save token to store
                 SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();

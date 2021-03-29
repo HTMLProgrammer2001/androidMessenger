@@ -91,7 +91,7 @@ public class LoginFragment extends Fragment {
         });
 
         codeInputFragment.setResendCb(() -> {
-            UserActionsAPI.resend(phone.getText().toString(), CodeTypes.LOGIN, (e, response) -> {
+            UserActionsAPI.resend(phone.getText().toString(), CodeTypes.LOGIN.getValue(), (e, response) -> {
                 requireActivity().runOnUiThread(() -> onResend(e, response));
             });
         });
@@ -248,6 +248,7 @@ public class LoginFragment extends Fragment {
             if (e == null && response.isSuccessful()) {
                 //save user
                 meState.setUser(User.fromJSON(respObj.getJSONObject("user")));
+                meState.setToken(respObj.getString("token"));
 
                 //save token to store
                 SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();

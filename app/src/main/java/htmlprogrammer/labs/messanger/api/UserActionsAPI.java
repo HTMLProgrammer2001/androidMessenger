@@ -104,7 +104,7 @@ public class UserActionsAPI {
         catch (Exception e){ }
     }
 
-    public static void resend(String phone, CodeTypes type, APICallback callback){
+    public static void resend(String phone, int type, APICallback callback){
         JSONObject data = new JSONObject();
 
         try {
@@ -113,6 +113,48 @@ public class UserActionsAPI {
             RequestBody body = RequestBody.create(JSON, data.toString());
 
             Request request = new Request.Builder().url(BuildConfig.API_URL + "/resend").post(body).build();
+            makeCall(request, callback);
+        }
+        catch (Exception e){}
+    }
+
+    public static void logout(String token, APICallback callback){
+        Request request = new Request.Builder()
+                .url(BuildConfig.API_URL + "/logout")
+                .addHeader("Authorization", "Bearer " + token)
+                .post(RequestBody.create(JSON, ""))
+                .build();
+
+        makeCall(request, callback);
+    }
+
+    public static void changePhone(String oldPhone, String newPhone, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try {
+            data.put("oldPhone", oldPhone);
+            data.put("newPhone", newPhone);
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/changePhone")
+                    .post(body).build();
+
+            makeCall(request, callback);
+        }
+        catch (Exception e){}
+    }
+
+    public static void confirmChangePhone(String oldCode, String newCode, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try {
+            data.put("oldCode", oldCode);
+            data.put("newCode", newCode);
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/confirm/changePhone")
+                    .post(body).build();
+
             makeCall(request, callback);
         }
         catch (Exception e){}

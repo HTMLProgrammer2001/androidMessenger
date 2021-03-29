@@ -25,4 +25,5 @@
     <string name="invalidNick">Nick must be from 4 to 32 symbols and start with latin letter</string>
     <string name="notSame">This field must be not same</string>
     <string name="newCodeSent">New code was sent</string>
+    <string name="phoneChanged">Phone changed</string>
 </resources>
