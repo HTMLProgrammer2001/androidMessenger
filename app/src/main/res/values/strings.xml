@@ -26,4 +26,11 @@
     <string name="notSame">This field must be not same</string>
     <string name="newCodeSent">New code was sent</string>
     <string name="phoneChanged">Phone changed</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="menu_chat">Create chat</string>
+    <string name="menu_info">Info</string>
+    <string name="create_chat">Create chat</string>
+    <string name="settings">Settings</string>
+    <string name="info">Info</string>
 </resources>

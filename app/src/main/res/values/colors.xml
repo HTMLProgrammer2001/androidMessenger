@@ -6,6 +6,7 @@
 
     <color name="bgBlue">#5682a3</color>
     <color name="bgGray">#e7ebf0</color>
+    <color name="bgGreen">#0f0</color>
 
     <color name="textWhite">#fff</color>
     <color name="textError">#f00</color>

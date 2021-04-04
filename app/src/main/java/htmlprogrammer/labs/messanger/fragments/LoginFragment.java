@@ -24,8 +24,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
-
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
 import htmlprogrammer.labs.messanger.constants.CodeTypes;
@@ -50,9 +48,7 @@ public class LoginFragment extends Fragment {
     private boolean isLoading = false;
 
     public LoginFragment() {
-        // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
