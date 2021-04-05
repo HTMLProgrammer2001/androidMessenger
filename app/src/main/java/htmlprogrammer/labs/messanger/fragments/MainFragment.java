@@ -1,28 +1,29 @@
 package htmlprogrammer.labs.messanger.fragments;
 
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import htmlprogrammer.labs.messanger.R;
-import htmlprogrammer.labs.messanger.store.MeState;
+import htmlprogrammer.labs.messanger.adapters.DialogAdapter;
+import htmlprogrammer.labs.messanger.models.Dialog;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MainFragment extends Fragment {
+    private RecyclerView list;
 
-
-    public MainFragment() {
-        // Required empty public constructor
-    }
+    public MainFragment() { }
 
 
     @Override
@@ -33,21 +34,22 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.test).setOnClickListener(v -> {
-            SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();
-            editor.remove("token");
-            editor.apply();
+        list = view.findViewById(R.id.list);
 
-            ViewModelProviders.of(requireActivity()).get(MeState.class).setUser(null);
-        });
+        ArrayList<Dialog> arr = new ArrayList<>();
+        Dialog dialog = new Dialog();
+        dialog.setName("Test");
+        dialog.setNick("Nick");
+        arr.add(dialog);
+
+        DialogAdapter adapter = new DialogAdapter(getContext(), arr);
+        list.setAdapter(adapter);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        list.setLayoutManager(layoutManager);
     }
 }
