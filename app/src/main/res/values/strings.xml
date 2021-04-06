@@ -46,4 +46,7 @@
     <string name="notifications">Notifications</string>
     <string name="language">Language</string>
     <string name="logout">Logout</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
 </resources>

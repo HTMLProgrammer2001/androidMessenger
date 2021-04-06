@@ -1,6 +1,7 @@
 package htmlprogrammer.labs.messanger.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,8 +26,10 @@ import org.json.JSONObject;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
+import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.constants.CodeTypes;
 import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
+import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.models.User;
 import okhttp3.Response;
 
@@ -44,8 +47,13 @@ public class ChangePhoneFragment extends Fragment {
     private boolean isCodeStep = false;
     private boolean isLoading = false;
 
-    public ChangePhoneFragment() {
-        // Required empty public constructor
+    public ChangePhoneFragment() {}
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ActionBarChanged actionBarChanged = (ActionBarChanged) context;
+        actionBarChanged.setActionBarType(ActionBarType.NONE);
     }
 
     @Override

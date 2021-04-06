@@ -5,53 +5,118 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
+import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.dialogs.InfoDialog;
 import htmlprogrammer.labs.messanger.fragments.LoginFragment;
 import htmlprogrammer.labs.messanger.fragments.MainFragment;
 import htmlprogrammer.labs.messanger.fragments.SettingsFragment;
 import htmlprogrammer.labs.messanger.fragments.common.Loader;
 import htmlprogrammer.labs.messanger.fragments.common.UserAvatar;
+import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.interfaces.DrawerClosable;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeState;
 
-public class MainActivity extends AppCompatActivity implements DrawerClosable {
+public class MainActivity extends AppCompatActivity implements DrawerClosable, ActionBarChanged {
     private MeState meState;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private ActionBar bar;
+    private ActionBarType actionBarType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //find elements
         drawerLayout = findViewById(R.id.drawer);
         navigationView = findViewById(R.id.navView);
 
+        //show action bar
+        bar = getSupportActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
+        bar.setHomeAsUpIndicator(R.drawable.burger);
+
+        //init listeners
         navigationView.setNavigationItemSelectedListener(this::onNavigationSelect);
 
         meState = ViewModelProviders.of(this).get(MeState.class);
+
         initMe();
         subscribe();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        FragmentManager fm = getSupportFragmentManager();
+
+        if (fm.getBackStackEntryCount() > 1)
+            fm.popBackStack();
+        else
+            finish();
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(actionBarType == ActionBarType.TOOLBAR) {
+            toggleSidebar();
+        }
+        else if(actionBarType == ActionBarType.BACK) {
+            getSupportFragmentManager().popBackStack();
+        }
+        else {
+            return super.onOptionsItemSelected(item);
+        }
+
+        return true;
+    }
+
+    private void toggleSidebar(){
+        if(drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            drawerLayout.closeDrawer(Gravity.START);
+        }
+        else {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        }
     }
 
     public void setDrawerOpen(boolean isOpen){
         int lockMode = isOpen ? DrawerLayout.LOCK_MODE_UNDEFINED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
         drawerLayout.setDrawerLockMode(lockMode);
+    }
+
+    @Override
+    public void setActionBarType(ActionBarType type) {
+        this.actionBarType = type;
+
+        if(type == ActionBarType.NONE){
+            bar.setDisplayHomeAsUpEnabled(false);
+        }
+        else if(type == ActionBarType.BACK){
+            bar.setDisplayHomeAsUpEnabled(true);
+            bar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+        }
+        else{
+            bar.setDisplayHomeAsUpEnabled(true);
+            bar.setHomeAsUpIndicator(R.drawable.burger);
+        }
     }
 
     public boolean onNavigationSelect(MenuItem item){
@@ -130,8 +195,7 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable {
     }
 
     private void redirectToMain(User user){
-        String shortName = user.getFullName();
-        UserAvatar avatarFragment = UserAvatar.getInstance(shortName, user.getAvatar());
+        UserAvatar avatarFragment = UserAvatar.getInstance(user.getFullName(), user.getAvatar());
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, new MainFragment(), null)
@@ -149,18 +213,5 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable {
         phone.setText(user.getPhone());
 
         this.setDrawerOpen(true);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        FragmentManager fm = getSupportFragmentManager();
-
-        if (fm.getBackStackEntryCount() > 1)
-            fm.popBackStack();
-        else
-            finish();
-
     }
 }

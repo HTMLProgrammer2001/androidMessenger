@@ -22,7 +22,10 @@ import htmlprogrammer.labs.messanger.R;
  */
 public class UserAvatar extends Fragment {
     private ImageView imgView;
-    private TextView shortName;
+    private TextView shortNameView;
+
+    private String imgURL = "";
+    private String name = "";
 
 
     public UserAvatar() { }
@@ -31,7 +34,7 @@ public class UserAvatar extends Fragment {
         UserAvatar avatarFragment = new UserAvatar();
         Bundle args = new Bundle();
 
-        args.putString("shortName", shortName);
+        args.putString("name", shortName);
         args.putString("imgURL", url);
 
         avatarFragment.setArguments(args);
@@ -51,28 +54,51 @@ public class UserAvatar extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         imgView = view.findViewById(R.id.img);
-        shortName = view.findViewById(R.id.shortName);
+        shortNameView = view.findViewById(R.id.shortName);
 
-        initUI();
+        Bundle args = getArguments();
+
+        if(this.name == null || this.name.equals(""))
+            this.name = args.getString("name");
+
+        if(this.imgURL == null || this.imgURL.equals(""))
+            this.imgURL = args.getString("imgURL");
+
+        initUI(name, imgURL);
     }
 
-    private void initUI(){
-        String imgURL = getArguments().getString("imgURL");
+    public void initUI(String name, String imgURL){
+        boolean hasImg = imgURL != null && !imgURL.equals("");
+        boolean hasName = name != null && !name.equals("");
 
-        if(imgURL == null || imgURL.equals("")){
-            String name = getArguments().getString("shortName");
-            shortName.setText(name);
+        //set data
+        this.name = name;
+        this.imgURL = imgURL;
 
-            shortName.setVisibility(View.VISIBLE);
-            imgView.setVisibility(View.INVISIBLE);
+        if(imgView == null)
+            return;
 
-            System.err.println("Name: " + name);
-        }
-        else{
+        if(hasImg){
+            //show image
             Picasso.get().load(imgURL).into(imgView);
 
-            shortName.setVisibility(View.INVISIBLE);
+            shortNameView.setVisibility(View.INVISIBLE);
             imgView.setVisibility(View.VISIBLE);
+        }
+        else if(hasName){
+            //parse name
+            String[] words = name.split(" ");
+            String shortName = "";
+
+            for(int i = 0; i < words.length; i++) {
+                shortName += words[i].substring(0, 1);
+            }
+
+            //show name
+            shortNameView.setText(shortName);
+
+            shortNameView.setVisibility(View.VISIBLE);
+            imgView.setVisibility(View.INVISIBLE);
         }
     }
 }

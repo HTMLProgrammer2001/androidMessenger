@@ -2,6 +2,7 @@ package htmlprogrammer.labs.messanger.fragments;
 
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,8 +29,10 @@ import org.json.JSONObject;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
+import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.constants.CodeTypes;
 import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
+import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeState;
 import okhttp3.Response;
@@ -53,6 +56,12 @@ public class SignFragment extends Fragment {
 
     public SignFragment() { }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ActionBarChanged actionBarChanged = (ActionBarChanged) context;
+        actionBarChanged.setActionBarType(ActionBarType.NONE);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

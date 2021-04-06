@@ -1,6 +1,7 @@
 package htmlprogrammer.labs.messanger.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.adapters.DialogAdapter;
+import htmlprogrammer.labs.messanger.constants.ActionBarType;
+import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.models.Dialog;
 
 /**
@@ -25,6 +28,12 @@ public class MainFragment extends Fragment {
 
     public MainFragment() { }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ActionBarChanged actionBarChanged = (ActionBarChanged) context;
+        actionBarChanged.setActionBarType(ActionBarType.TOOLBAR);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
