@@ -7,9 +7,9 @@
     tools:context=".fragments.common.UserAvatar">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/root"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/bgGreen">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/img"

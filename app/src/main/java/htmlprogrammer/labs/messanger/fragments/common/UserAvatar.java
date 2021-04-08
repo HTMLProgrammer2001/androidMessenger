@@ -1,9 +1,11 @@
 package htmlprogrammer.labs.messanger.fragments.common;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +25,10 @@ import htmlprogrammer.labs.messanger.R;
 public class UserAvatar extends Fragment {
     private ImageView imgView;
     private TextView shortNameView;
+    private ConstraintLayout root;
 
     private String imgURL = "";
     private String name = "";
-
 
     public UserAvatar() { }
 
@@ -53,9 +55,12 @@ public class UserAvatar extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        //find elements
         imgView = view.findViewById(R.id.img);
         shortNameView = view.findViewById(R.id.shortName);
+        root = view.findViewById(R.id.root);
 
+        //get data from bundle
         Bundle args = getArguments();
 
         if(this.name == null || this.name.equals(""))
@@ -82,6 +87,7 @@ public class UserAvatar extends Fragment {
             //show image
             Picasso.get().load(imgURL).into(imgView);
 
+            root.setBackgroundColor(Color.TRANSPARENT);
             shortNameView.setVisibility(View.INVISIBLE);
             imgView.setVisibility(View.VISIBLE);
         }
@@ -95,6 +101,7 @@ public class UserAvatar extends Fragment {
             }
 
             //show name
+            root.setBackgroundColor(getResources().getColor(R.color.bgGreen));
             shortNameView.setText(shortName);
 
             shortNameView.setVisibility(View.VISIBLE);

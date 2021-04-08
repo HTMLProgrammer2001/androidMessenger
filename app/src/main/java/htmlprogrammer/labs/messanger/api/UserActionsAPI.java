@@ -2,37 +2,13 @@ package htmlprogrammer.labs.messanger.api;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 import htmlprogrammer.labs.messanger.BuildConfig;
-import htmlprogrammer.labs.messanger.constants.CodeTypes;
 import htmlprogrammer.labs.messanger.interfaces.APICallback;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
+import htmlprogrammer.labs.messanger.interfaces.ApiClass;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
-public class UserActionsAPI {
-    private static OkHttpClient client = new OkHttpClient();
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
-    private static void makeCall(Request req, APICallback callback){
-        client.newCall(req).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.run(e, null);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response){
-                callback.run(null, response);
-            }
-        });
-    }
-
+public class UserActionsAPI extends ApiClass {
     public static void getMe(String token, APICallback callback){
         Request request = new Request.Builder()
                 .url(BuildConfig.API_URL + "/me")

@@ -41,7 +41,7 @@
 
     <string name="account">Account</string>
     <string name="phoneHelper">Tap to change phone</string>
-    <string name="nickHelper">Nickname</string>
+    <string name="nickHelper">Tap to change nickname</string>
     <string name="descriptionHelper">Write some about you</string>
     <string name="notifications">Notifications</string>
     <string name="language">Language</string>
@@ -49,4 +49,5 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
+    <string name="changeNick">Change nickname</string>
 </resources>
