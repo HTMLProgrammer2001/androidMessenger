@@ -33,6 +33,8 @@ import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.EditMeAPI;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
 import htmlprogrammer.labs.messanger.constants.ActionBarType;
+import htmlprogrammer.labs.messanger.dialogs.DescriptionChangeDialog;
+import htmlprogrammer.labs.messanger.dialogs.NameChangeDialog;
 import htmlprogrammer.labs.messanger.dialogs.NickChangeDialog;
 import htmlprogrammer.labs.messanger.fragments.common.UserAvatar;
 import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
@@ -52,6 +54,7 @@ public class SettingsFragment extends Fragment {
     private LinearLayout phoneLayout;
     private LinearLayout nickLayout;
     private LinearLayout descLayout;
+    private LinearLayout deleteAvatar;
 
     private TextView logout;
     private LinearLayout uploader;
@@ -98,6 +101,7 @@ public class SettingsFragment extends Fragment {
         phoneLayout = view.findViewById(R.id.phoneLayout);
         nickLayout = view.findViewById(R.id.nickLayout);
         descLayout = view.findViewById(R.id.descLayout);
+        deleteAvatar = view.findViewById(R.id.deleteAvatar);
 
         logout = view.findViewById(R.id.logout);
         uploader = view.findViewById(R.id.photoUploader);
@@ -155,11 +159,20 @@ public class SettingsFragment extends Fragment {
             if(user == null)
                 return;
 
+            //toggle delete button
+            if(user.getAvatar() == null){
+                deleteAvatar.setVisibility(View.GONE);
+            }
+            else{
+                deleteAvatar.setVisibility(View.VISIBLE);
+            }
+
             //show user data
             avatarFragment.initUI(user.getFullName(), user.getAvatar());
             name.setText(user.getFullName());
             nick.setText(user.getNick());
             phone.setText(user.getPhone());
+            description.setText(user.getDescription() == null ? getString(R.string.notSet) : user.getDescription());
         });
 
         //add handlers
@@ -168,6 +181,8 @@ public class SettingsFragment extends Fragment {
         nickLayout.setOnClickListener(this::changeNick);
         phoneLayout.setOnClickListener(this::changePhone);
         descLayout.setOnClickListener(this::changeDescription);
+        name.setOnClickListener(this::changeName);
+        deleteAvatar.setOnClickListener(this::deleteAvatar);
     }
 
     private void logout(View view){
@@ -193,9 +208,15 @@ public class SettingsFragment extends Fragment {
     }
 
     private void changeNick(View view){
-        //show nick
+        //show dialog
         NickChangeDialog dialog = new NickChangeDialog();
         dialog.show(requireFragmentManager(), "changeNickDialog");
+    }
+
+    private void changeName(View view){
+        //show dialog
+        NameChangeDialog dialog = new NameChangeDialog();
+        dialog.show(requireFragmentManager(), "changeNameDialog");
     }
 
     private void changePhone(View view){
@@ -207,8 +228,14 @@ public class SettingsFragment extends Fragment {
                 .commit();
     }
 
-    public void changeDescription(View view){
+    private void changeDescription(View view){
+        //show dialog
+        DescriptionChangeDialog dialog = new DescriptionChangeDialog();
+        dialog.show(requireFragmentManager(), "changeDescriptionDialog");
+    }
 
+    private void deleteAvatar(View view){
+        EditMeAPI.deleteAvatar(pref.getString("token", ""), this::onPhotoChanged);
     }
 
     private void onPhotoChanged(Exception e, Response response){

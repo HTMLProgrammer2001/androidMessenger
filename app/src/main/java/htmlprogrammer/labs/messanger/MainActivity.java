@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
     private ActionBar bar;
     private ActionBarType actionBarType;
 
+    private UserAvatar userAvatarFragment;
+    private boolean isMain = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
         //find elements
         drawerLayout = findViewById(R.id.drawer);
         navigationView = findViewById(R.id.navView);
+
+        //create avatar fragment
+        userAvatarFragment = UserAvatar.getInstance("", "");
 
         //show action bar
         bar = getSupportActionBar();
@@ -75,29 +81,24 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(actionBarType == ActionBarType.TOOLBAR) {
+        if (actionBarType == ActionBarType.TOOLBAR)
             toggleSidebar();
-        }
-        else if(actionBarType == ActionBarType.BACK) {
+        else if (actionBarType == ActionBarType.BACK)
             getSupportFragmentManager().popBackStack();
-        }
-        else {
+        else
             return super.onOptionsItemSelected(item);
-        }
 
         return true;
     }
 
-    private void toggleSidebar(){
-        if(drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+    private void toggleSidebar() {
+        if (drawerLayout.isDrawerOpen(Gravity.LEFT))
             drawerLayout.closeDrawer(Gravity.START);
-        }
-        else {
+        else
             drawerLayout.openDrawer(Gravity.LEFT);
-        }
     }
 
-    public void setDrawerOpen(boolean isOpen){
+    public void setDrawerOpen(boolean isOpen) {
         int lockMode = isOpen ? DrawerLayout.LOCK_MODE_UNDEFINED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
         drawerLayout.setDrawerLockMode(lockMode);
     }
@@ -106,21 +107,19 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
     public void setActionBarType(ActionBarType type) {
         this.actionBarType = type;
 
-        if(type == ActionBarType.NONE){
+        if (type == ActionBarType.NONE) {
             bar.setDisplayHomeAsUpEnabled(false);
-        }
-        else if(type == ActionBarType.BACK){
+        } else if (type == ActionBarType.BACK) {
             bar.setDisplayHomeAsUpEnabled(true);
             bar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
-        }
-        else{
+        } else {
             bar.setDisplayHomeAsUpEnabled(true);
             bar.setHomeAsUpIndicator(R.drawable.burger);
         }
     }
 
-    public boolean onNavigationSelect(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onNavigationSelect(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.settings:
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container, new SettingsFragment(), null)
@@ -166,9 +165,29 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
         meState.getUser().observe(this, (user) -> {
             if (user == null) {
                 redirectToLogin();
-            } else {
-                redirectToMain(user);
+                isMain = false;
+                return;
             }
+
+            if (!isMain) {
+                redirectToMain();
+                isMain = true;
+            }
+
+            //show avatar
+            userAvatarFragment.initUI(user.getFullName(), user.getAvatar());
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.avatarFrame, userAvatarFragment, null)
+                    .commit();
+
+            //show data
+            View headerView = navigationView.getHeaderView(0);
+
+            TextView name = headerView.findViewById(R.id.name);
+            name.setText(user.getFullName() + "(" + user.getNick() + ")");
+
+            TextView phone = headerView.findViewById(R.id.phone);
+            phone.setText(user.getPhone());
         });
 
         meState.getLoadingData().observe(this, isLoading -> {
@@ -184,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
         });
     }
 
-    private void redirectToLogin(){
+    private void redirectToLogin() {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.container, new LoginFragment(), null)
@@ -194,23 +213,11 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
         this.setDrawerOpen(false);
     }
 
-    private void redirectToMain(User user){
-        UserAvatar avatarFragment = UserAvatar.getInstance(user.getFullName(), user.getAvatar());
-
+    private void redirectToMain() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, new MainFragment(), null)
                 .addToBackStack("main")
-                .replace(R.id.avatarFrame, avatarFragment, null)
                 .commit();
-
-        NavigationView navigationView = findViewById(R.id.navView);
-        View headerView = navigationView.getHeaderView(0);
-
-        TextView name = headerView.findViewById(R.id.name);
-        name.setText(user.getFullName() + "(" + user.getNick() + ")");
-
-        TextView phone = headerView.findViewById(R.id.phone);
-        phone.setText(user.getPhone());
 
         this.setDrawerOpen(true);
     }

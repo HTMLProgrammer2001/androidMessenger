@@ -7,6 +7,18 @@ public class User {
     private String fullName = "";
     private String phone = "";
     private String nick = "";
+    private String description = "";
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        if(description.equals("") || description.equals("null"))
+            this.description = null;
+        else
+            this.description = description;
+    }
 
     public String getPhone() {
         return phone;
@@ -29,7 +41,10 @@ public class User {
     }
 
     public void setAvatar(String avatar) {
-        this.avatar = avatar;
+        if(avatar.equals("") || avatar.equals("null"))
+            this.avatar = null;
+        else
+            this.avatar = avatar;
     }
 
     public String getFullName() {
@@ -48,6 +63,7 @@ public class User {
              user.setNick(obj.getString("nickname"));
              user.setPhone(obj.getString("phone"));
              user.setAvatar(obj.getString("avatar"));
+             user.setDescription(obj.getString("description"));
          }
          catch (Exception e){}
 

@@ -27,6 +27,7 @@
     <string name="errorOccured">Some errors occured</string>
     <string name="invalidCode">Invalid code</string>
     <string name="invalidNick">Nick must be from 4 to 32 symbols and start with latin letter</string>
+    <string name="invalidName">Name must be from 4 to 32 symbols and start with latin letter</string>
     <string name="notSame">This field must be not same</string>
     <string name="newCodeSent">New code was sent</string>
     <string name="phoneChanged">Phone changed</string>
@@ -50,4 +51,8 @@
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
     <string name="changeNick">Change nickname</string>
+    <string name="changeName">Change name</string>
+    <string name="deleteAvatar">Delete avatar</string>
+    <string name="enterDesc">Enter description</string>
+    <string name="changeDesc">Change description</string>
 </resources>

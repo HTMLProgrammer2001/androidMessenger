@@ -64,4 +64,13 @@ public class EditMeAPI extends ApiClass {
     public static void editDesc(String token, String newDesc, APICallback callback){
         changeMe(token, "description", newDesc, callback);
     }
+
+    public static void deleteAvatar(String token, APICallback callback){
+        Request request = new Request.Builder().url(BuildConfig.API_URL + "/avatar")
+                .addHeader("Authorization", "Bearer " + token)
+                .delete()
+                .build();
+
+        makeCall(request, callback);
+    }
 }

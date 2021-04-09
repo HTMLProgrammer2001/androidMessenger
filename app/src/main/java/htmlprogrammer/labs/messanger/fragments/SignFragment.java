@@ -138,7 +138,7 @@ public class SignFragment extends Fragment {
         validation.addValidation(nickEdit, RegexTemplate.NOT_EMPTY, getString(R.string.requiredField));
 
         validation.addValidation(phoneEdit, Patterns.PHONE, getString(R.string.invalidPhone));
-        validation.addValidation(nameEdit, "[a-zA-Z]\\w{3,31}", getString(R.string.invalidNick));
+        validation.addValidation(nameEdit, "[a-zA-Z]\\w{3,31}", getString(R.string.invalidName));
         validation.addValidation(nickEdit, "[a-zA-Z]\\w{3,31}", getString(R.string.invalidNick));
 
         nextButton.setOnClickListener(view -> {
