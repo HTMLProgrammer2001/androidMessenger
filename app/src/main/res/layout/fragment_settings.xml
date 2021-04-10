@@ -243,7 +243,7 @@
                 android:layout_marginEnd="8dp"
                 android:text="@string/notifications"
                 android:textColor="@color/textBlack"
-                app:layout_constraintEnd_toStartOf="@+id/switch1"
+                app:layout_constraintEnd_toStartOf="@+id/notificationSwitch"
                 app:layout_constraintStart_toEndOf="@+id/imageView2"
                 app:layout_constraintTop_toTopOf="@+id/imageView2" />
 
@@ -274,7 +274,7 @@
                 android:layout_marginEnd="8dp"
                 android:text="@string/language"
                 android:textColor="@color/textBlack"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/languageName"
                 app:layout_constraintStart_toEndOf="@+id/imageView3"
                 app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
@@ -310,13 +310,24 @@
                 app:layout_constraintTop_toBottomOf="@+id/divider5" />
 
             <Switch
-                android:id="@+id/switch1"
+                android:id="@+id/notificationSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="10dp"
                 app:layout_constraintBottom_toTopOf="@+id/divider4"
                 app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/languageName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/curLang"
+                android:textColor="@color/textBlue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
         </android.support.constraint.ConstraintLayout>
 

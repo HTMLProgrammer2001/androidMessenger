@@ -23,6 +23,7 @@ import htmlprogrammer.labs.messanger.fragments.MainFragment;
 import htmlprogrammer.labs.messanger.fragments.SettingsFragment;
 import htmlprogrammer.labs.messanger.fragments.common.Loader;
 import htmlprogrammer.labs.messanger.fragments.common.UserAvatar;
+import htmlprogrammer.labs.messanger.helpers.LanguageHelper;
 import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.interfaces.DrawerClosable;
 import htmlprogrammer.labs.messanger.models.User;
@@ -42,6 +43,11 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //change language
+        SharedPreferences pref = getSharedPreferences("store", 0);
+        LanguageHelper.setLocale(this, pref.getString("language", "en"));
+
         setContentView(R.layout.activity_main);
 
         //find elements

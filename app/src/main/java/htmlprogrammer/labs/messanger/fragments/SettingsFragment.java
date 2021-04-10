@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ import htmlprogrammer.labs.messanger.api.EditMeAPI;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
 import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.dialogs.DescriptionChangeDialog;
+import htmlprogrammer.labs.messanger.dialogs.LanguageDialog;
 import htmlprogrammer.labs.messanger.dialogs.NameChangeDialog;
 import htmlprogrammer.labs.messanger.dialogs.NickChangeDialog;
 import htmlprogrammer.labs.messanger.fragments.common.UserAvatar;
@@ -50,6 +52,7 @@ public class SettingsFragment extends Fragment {
     private TextView phone;
     private TextView nick;
     private TextView description;
+    private TextView language;
 
     private LinearLayout phoneLayout;
     private LinearLayout nickLayout;
@@ -58,6 +61,7 @@ public class SettingsFragment extends Fragment {
 
     private TextView logout;
     private LinearLayout uploader;
+    private Switch notificationSwitch;
 
     private MeState meState;
     private UserAvatar avatarFragment;
@@ -83,7 +87,6 @@ public class SettingsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -103,10 +106,13 @@ public class SettingsFragment extends Fragment {
         descLayout = view.findViewById(R.id.descLayout);
         deleteAvatar = view.findViewById(R.id.deleteAvatar);
 
+        language = view.findViewById(R.id.language);
         logout = view.findViewById(R.id.logout);
         uploader = view.findViewById(R.id.photoUploader);
+        notificationSwitch = view.findViewById(R.id.notificationSwitch);
 
         pref = requireActivity().getSharedPreferences("store", 0);
+        notificationSwitch.setChecked(pref.getBoolean("notification", true));
 
         //show avatar
         requireActivity()
@@ -183,28 +189,20 @@ public class SettingsFragment extends Fragment {
         descLayout.setOnClickListener(this::changeDescription);
         name.setOnClickListener(this::changeName);
         deleteAvatar.setOnClickListener(this::deleteAvatar);
+        notificationSwitch.setOnCheckedChangeListener(this::notificationChanged);
+        language.setOnClickListener(this::changeLanguage);
     }
 
-    private void logout(View view){
-        //make api call
-        UserActionsAPI.logout(pref.getString("token", ""), (e, response) -> {});
-
-        //logout
-        meState.setUser(null);
-        meState.setToken(null);
-
-        //delete from shared preference
+    private void notificationChanged(View view, boolean isChecked){
         SharedPreferences.Editor editor = pref.edit();
-
-        editor.remove("token");
+        editor.putBoolean("notification", isChecked);
         editor.apply();
     }
 
-    private void uploadPhoto(View view){
-        //open image
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, PHOTO_CODE);
+    private void changeLanguage(View view){
+        //show dialog
+        LanguageDialog dialog = new LanguageDialog();
+        dialog.show(requireFragmentManager(), "changeLanguage");
     }
 
     private void changeNick(View view){
@@ -236,6 +234,28 @@ public class SettingsFragment extends Fragment {
 
     private void deleteAvatar(View view){
         EditMeAPI.deleteAvatar(pref.getString("token", ""), this::onPhotoChanged);
+    }
+
+    private void logout(View view){
+        //make api call
+        UserActionsAPI.logout(pref.getString("token", ""), (e, response) -> {});
+
+        //logout
+        meState.setUser(null);
+        meState.setToken(null);
+
+        //delete from shared preference
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.remove("token");
+        editor.apply();
+    }
+
+    private void uploadPhoto(View view){
+        //open image
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, PHOTO_CODE);
     }
 
     private void onPhotoChanged(Exception e, Response response){

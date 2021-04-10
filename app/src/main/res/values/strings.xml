@@ -55,4 +55,6 @@
     <string name="deleteAvatar">Delete avatar</string>
     <string name="enterDesc">Enter description</string>
     <string name="changeDesc">Change description</string>
+    <string name="curLang">en</string>
+    <string name="reload">Reload app</string>
 </resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Messenger</string>
+
+    <string name="next">Дальше</string>
+    <string name="online">Онлайн</string>
+    <string name="offline">Офлайн</string>
+    <string name="chooseImage">Выбрать изображение</string>
+
+    <string name="back">Назад</string>
+    <string name="loading">Загрузка...</string>
+    <string name="logo">Лого</string>
+    <string name="signin">Зарегистрироваться</string>
+    <string name="changePhone">Изменить телефон</string>
+
+    <string name="enterPhone">Ввести телефон</string>
+    <string name="enterOldPhone">Ввести старый телефон</string>
+    <string name="enterNewPhone">Ввести новый телефон</string>
+    <string name="enterName">Ввести имя</string>
+    <string name="enterNick">Ввести ник</string>
+
+    <string name="loginForm">Логин</string>
+    <string name="loginDetails">Введите данные в это поле</string>
+
+    <string name="invalidPhone">Неверный формат телефона</string>
+    <string name="requiredField">Обязательное поле</string>
+    <string name="errorOccured">Произошли ошибки</string>
+    <string name="invalidCode">Неверный код</string>
+    <string name="invalidNick">Ник должен быть от 4 до 32 символов и начинаться с латиницы</string>
+    <string name="invalidName">Ник должен быть от 4 до 32 символов и начинаться с латиницы</string>
+    <string name="notSame">Это поле не должно совпадать</string>
+    <string name="newCodeSent">Новый код был отправлен</string>
+    <string name="phoneChanged">Телефон изменен</string>
+    <string name="notSet">Не установлено</string>
+
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_chat">Создать чат</string>
+    <string name="menu_info">Информация</string>
+    <string name="create_chat">Создать чат</string>
+    <string name="settings">Настройки</string>
+    <string name="info">Информация</string>
+
+    <string name="account">Аккаунт</string>
+    <string name="phoneHelper">Нажмите чтобы изменить телефон</string>
+    <string name="nickHelper">Нажмите чтобы изменить ник</string>
+    <string name="descriptionHelper">Напишите немного о себе</string>
+    <string name="notifications">Уведомления</string>
+    <string name="language">Язык</string>
+    <string name="logout">Выйти</string>
+    <string name="open">Открыть</string>
+    <string name="close">Закрыть</string>
+    <string name="cancel">Отмена</string>
+    <string name="changeNick">Изменить ник</string>
+    <string name="changeName">Изменить имя</string>
+    <string name="deleteAvatar">Удалить аватар</string>
+    <string name="enterDesc">Введите описание</string>
+    <string name="changeDesc">Изменить описание</string>
+    <string name="curLang">ру</string>
+    <string name="reload">Перезапустите приложение</string>
+</resources>
