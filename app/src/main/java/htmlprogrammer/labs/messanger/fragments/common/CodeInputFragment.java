@@ -34,9 +34,7 @@ public class CodeInputFragment extends Fragment {
     private Timer resendTimer;
     private boolean isResendActive = true;
 
-    public CodeInputFragment(){
-
-    }
+    public CodeInputFragment(){ }
 
 
     @Override
@@ -97,6 +95,10 @@ public class CodeInputFragment extends Fragment {
 
     public String getCode(){
         return codeInput.getText().toString();
+    }
+
+    public void setCode(String code){
+        codeInput.setText(code);
     }
 
     public void showError(String error){
