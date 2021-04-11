@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 import java.net.URL;
 
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.dialogs.ImageDialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,6 +61,9 @@ public class UserAvatar extends Fragment {
         shortNameView = view.findViewById(R.id.shortName);
         root = view.findViewById(R.id.root);
 
+        //add handlers
+        imgView.setOnClickListener(this::imgListener);
+
         //get data from bundle
         Bundle args = getArguments();
 
@@ -70,6 +74,13 @@ public class UserAvatar extends Fragment {
             this.imgURL = args.getString("imgURL");
 
         initUI(name, imgURL);
+    }
+
+    private void imgListener(View view){
+        if(imgURL != null && !imgURL.equals("")){
+            ImageDialog dialog = ImageDialog.getInstance(this.imgURL);
+            dialog.show(requireFragmentManager(), "imgView");
+        }
     }
 
     public void initUI(String name, String imgURL){
