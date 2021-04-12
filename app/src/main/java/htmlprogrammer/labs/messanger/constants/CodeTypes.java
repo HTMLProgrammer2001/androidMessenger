@@ -7,7 +7,7 @@ public enum CodeTypes {
 
     private int value;
 
-    private CodeTypes(int val){
+    CodeTypes(int val){
         value = val;
     }
 

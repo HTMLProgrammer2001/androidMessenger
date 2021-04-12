@@ -3,6 +3,7 @@ package htmlprogrammer.labs.messanger.models;
 import org.json.JSONObject;
 
 public class User {
+    private String id;
     private String avatar;
     private String fullName = "";
     private String phone = "";
@@ -55,10 +56,19 @@ public class User {
         this.fullName = fullName;
     }
 
+    public String getId(){
+        return id;
+    }
+
+    public void setId(String id){
+        this.id = id;
+    }
+
     public static User fromJSON(JSONObject obj){
          User user = new User();
 
          try {
+             user.setId(obj.getString("_id"));
              user.setFullName(obj.getString("name"));
              user.setNick(obj.getString("nickname"));
              user.setPhone(obj.getString("phone"));
