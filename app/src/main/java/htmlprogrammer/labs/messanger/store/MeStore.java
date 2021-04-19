@@ -50,4 +50,8 @@ public class MeStore {
     public String getToken(){
         return token.getState();
     }
+
+    public User getUser() {
+        return user.getState();
+    }
 }

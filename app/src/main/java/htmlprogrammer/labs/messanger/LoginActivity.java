@@ -1,18 +1,14 @@
-package htmlprogrammer.labs.messanger.fragments;
-
+package htmlprogrammer.labs.messanger;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Patterns;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -26,82 +22,59 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
-import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.constants.CodeTypes;
-import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
-import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
+import htmlprogrammer.labs.messanger.fragments.CodeInputFragment;
+import htmlprogrammer.labs.messanger.interfaces.BaseActivity;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.receivers.CodeReceiver;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import okhttp3.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class LoginFragment extends Fragment {
+public class LoginActivity extends BaseActivity {
     private EditText phone;
     private TextView nextBtn, signBtn, changePhoneBtn, error;
     private AwesomeValidation validation;
     private FrameLayout codeInputContainer;
 
     private CodeInputFragment codeInputFragment;
-    private MeViewModel meVM;
     private MeStore meStore = MeStore.getInstance();
     private CodeReceiver receiver;
 
     private boolean isCodeStep = false;
     private boolean isLoading = false;
 
-    public LoginFragment() { }
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        ActionBarChanged actionBarChanged = (ActionBarChanged) context;
-        actionBarChanged.setActionBarType(ActionBarType.NONE);
-
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         receiver = new CodeReceiver(this::handleCode);
+
+        setContentView(R.layout.activity_login);
+
+        //find elements
+        phone = findViewById(R.id.et_phone);
+        signBtn = findViewById(R.id.sign);
+        changePhoneBtn = findViewById(R.id.changePhone);
+        nextBtn = findViewById(R.id.next);
+        error = findViewById(R.id.error);
+        codeInputContainer = findViewById(R.id.codeInputContainer);
+
+        createCodeInput();
+        activateLinks();
+        addValidation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        requireActivity().registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+        registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        requireActivity().unregisterReceiver(this.receiver);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        meVM = ViewModelProviders.of(requireActivity()).get(MeViewModel.class);
-
-        //find elements
-        phone = view.findViewById(R.id.et_phone);
-        signBtn = view.findViewById(R.id.sign);
-        changePhoneBtn = view.findViewById(R.id.changePhone);
-        nextBtn = view.findViewById(R.id.next);
-        error = view.findViewById(R.id.error);
-        codeInputContainer = view.findViewById(R.id.codeInputContainer);
-
-        createCodeInput();
-        activateLinks();
-        addValidation();
+        unregisterReceiver(this.receiver);
     }
 
     private void createCodeInput() {
@@ -116,12 +89,11 @@ public class LoginFragment extends Fragment {
 
         codeInputFragment.setResendCb(() -> {
             UserActionsAPI.resend(phone.getText().toString(), CodeTypes.LOGIN.getValue(), (e, response) -> {
-                requireActivity().runOnUiThread(() -> onResend(e, response));
+                runOnUiThread(() -> onResend(e, response));
             });
         });
 
-        requireActivity()
-                .getSupportFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputContainer, codeInputFragment, null)
@@ -132,23 +104,13 @@ public class LoginFragment extends Fragment {
 
     private void activateLinks() {
         signBtn.setOnClickListener((v) -> {
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.container, new SignFragment(), null)
-                    .addToBackStack("sign")
-                    .commit();
+            Intent signIntent = new Intent(this, SignActivity.class);
+            startActivity(signIntent);
         });
 
         changePhoneBtn.setOnClickListener((v) -> {
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.container, new ChangePhoneFragment(), null)
-                    .addToBackStack("changePhone")
-                    .commit();
+            Intent changePhoneIntent = new Intent(this, ChangePhoneActivity.class);
+            startActivity(changePhoneIntent);
         });
     }
 
@@ -191,7 +153,7 @@ public class LoginFragment extends Fragment {
             nextBtn.setTextColor(getResources().getColor(R.color.textGray));
 
             UserActionsAPI.login(phone.getText().toString(), (e, response) -> {
-                requireActivity().runOnUiThread(() -> onLogin(e, response));
+                runOnUiThread(() -> onLogin(e, response));
             });
         } else {
             //show error
@@ -206,7 +168,7 @@ public class LoginFragment extends Fragment {
             nextBtn.setTextColor(getResources().getColor(R.color.textGray));
 
             UserActionsAPI.confirmLogin(codeInputFragment.getCode(), (e, response) -> {
-                requireActivity().runOnUiThread(() -> onConfirmLogin(e, response));
+                runOnUiThread(() -> onConfirmLogin(e, response));
             });
         } else {
             //show error
@@ -217,7 +179,7 @@ public class LoginFragment extends Fragment {
 
     private void onResend(Exception e, Response response) {
         if (e == null && response.isSuccessful()) {
-            Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
         } else {
             //get error
             String errorText = e != null ? e.getMessage() : "";
@@ -238,7 +200,7 @@ public class LoginFragment extends Fragment {
                 codeInputContainer.setVisibility(View.VISIBLE);
 
                 error.setVisibility(View.GONE);
-                Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
             } else {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";
@@ -275,9 +237,11 @@ public class LoginFragment extends Fragment {
                 meStore.setToken(respObj.getString("token"));
 
                 //save token to store
-                SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();
+                SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("token", respObj.getString("token"));
                 editor.apply();
+
+                finish();
             } else {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";

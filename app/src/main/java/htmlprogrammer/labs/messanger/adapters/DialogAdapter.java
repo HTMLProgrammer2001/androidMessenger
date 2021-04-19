@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import htmlprogrammer.labs.messanger.R;
-import htmlprogrammer.labs.messanger.fragments.common.UserAvatar;
+import htmlprogrammer.labs.messanger.fragments.UserAvatar;
 import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.Message;
 
@@ -35,7 +35,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
 
     @Override
     public int getItemViewType(int position) {
-        if(isLoading)
+        if(isLoading && position == data.size())
             return LOADING_TYPE;
 
         return data.size() == 0 ? EMPTY_TYPE : LIST_TYPE;
@@ -61,7 +61,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
 
     @Override
     public void onBindViewHolder(@NonNull DialogViewHolder dialogViewHolder, int i) {
-        if(data.size() > 0){
+        if(data.size() > 0 && data.size() != i){
             Dialog dialog = data.get(i);
             dialogViewHolder.showName(dialog.getName());
             dialogViewHolder.showAvatar(dialog.getName(), dialog.getAvatar());
@@ -83,11 +83,6 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
     @Override
     public int getItemCount() {
         return Math.max(data.size() + (isLoading ? 1 : 0), 1);
-    }
-
-    @Override
-    public void onViewAttachedToWindow(@NonNull DialogViewHolder holder) {
-        super.onViewAttachedToWindow(holder);
     }
 
     public void setLoading(boolean isLoading){

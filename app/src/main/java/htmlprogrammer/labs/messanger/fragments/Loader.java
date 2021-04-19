@@ -1,4 +1,4 @@
-package htmlprogrammer.labs.messanger.fragments.common;
+package htmlprogrammer.labs.messanger.fragments;
 
 
 import android.os.Bundle;

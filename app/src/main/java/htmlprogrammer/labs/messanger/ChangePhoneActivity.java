@@ -1,17 +1,11 @@
-package htmlprogrammer.labs.messanger.fragments;
+package htmlprogrammer.labs.messanger;
 
-
-import android.content.Context;
 import android.content.IntentFilter;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Patterns;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -20,26 +14,18 @@ import android.widget.Toast;
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
-import com.basgeekball.awesomevalidation.utility.custom.SimpleCustomValidation;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
-import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.constants.CodeTypes;
-import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
-import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
-import htmlprogrammer.labs.messanger.models.User;
+import htmlprogrammer.labs.messanger.fragments.CodeInputFragment;
 import htmlprogrammer.labs.messanger.receivers.CodeReceiver;
 import okhttp3.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class ChangePhoneFragment extends Fragment {
+public class ChangePhoneActivity extends AppCompatActivity {
     private EditText oldPhoneEdit, newPhoneEdit;
     private FrameLayout codeInputContainerOld, codeInputContainerNew;
     private TextView back, error, nextButton;
@@ -51,54 +37,38 @@ public class ChangePhoneFragment extends Fragment {
     private boolean isCodeStep = false;
     private boolean isLoading = false;
 
-    public ChangePhoneFragment() {}
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        ActionBarChanged actionBarChanged = (ActionBarChanged) context;
-        actionBarChanged.setActionBarType(ActionBarType.NONE);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_change_phone);
 
-        //register sms receiver
         receiver = new CodeReceiver(this::handleCode);
+
+        nextButton = findViewById(R.id.next);
+        back = findViewById(R.id.back);
+        error = findViewById(R.id.error);
+        codeInputContainerNew = findViewById(R.id.codeInputNew);
+        codeInputContainerOld = findViewById(R.id.codeInputOld);
+        oldPhoneEdit = findViewById(R.id.et_oldPhone);
+        newPhoneEdit = findViewById(R.id.et_newPhone);
+
+        createCodeInput();
+        activateLinks();
+        addValidation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        requireActivity().registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+        registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        if(receiver != null)
-            requireActivity().unregisterReceiver(receiver);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_change_phone, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        nextButton = view.findViewById(R.id.next);
-        back = view.findViewById(R.id.back);
-        error = view.findViewById(R.id.error);
-        codeInputContainerNew = view.findViewById(R.id.codeInputNew);
-        codeInputContainerOld = view.findViewById(R.id.codeInputOld);
-        oldPhoneEdit = view.findViewById(R.id.et_oldPhone);
-        newPhoneEdit = view.findViewById(R.id.et_newPhone);
-
-        createCodeInput();
-        activateLinks();
-        addValidation();
+        if (receiver != null)
+            unregisterReceiver(receiver);
     }
 
     private void cancelCb() {
@@ -113,7 +83,7 @@ public class ChangePhoneFragment extends Fragment {
     private void resendCb(boolean isOld) {
         String phone = isOld ? oldPhoneEdit.getText().toString() : newPhoneEdit.getText().toString();
         UserActionsAPI.resend(phone, CodeTypes.CHANGE_PHONE.getValue(), (e, response) -> {
-            requireActivity().runOnUiThread(() -> onResend(e, response));
+            runOnUiThread(() -> onResend(e, response));
         });
     }
 
@@ -127,15 +97,13 @@ public class ChangePhoneFragment extends Fragment {
         codeInputFragmentNew.setResendCb(() -> resendCb(false));
         codeInputFragmentOld.setResendCb(() -> resendCb(true));
 
-        requireActivity()
-                .getSupportFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputOld, codeInputFragmentOld, null)
                 .commit();
 
-        requireActivity()
-                .getSupportFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputNew, codeInputFragmentNew, null)
@@ -146,7 +114,7 @@ public class ChangePhoneFragment extends Fragment {
     }
 
     private void activateLinks() {
-        back.setOnClickListener(view -> requireActivity().getSupportFragmentManager().popBackStack());
+        back.setOnClickListener((v) -> finish());
     }
 
     private void addValidation() {
@@ -180,7 +148,7 @@ public class ChangePhoneFragment extends Fragment {
             UserActionsAPI.changePhone(
                     oldPhoneEdit.getText().toString(),
                     newPhoneEdit.getText().toString(),
-                    (e, response) -> requireActivity().runOnUiThread(() -> onChange(e, response))
+                    (e, response) -> runOnUiThread(() -> onChange(e, response))
             );
         } else {
             //show error
@@ -197,7 +165,7 @@ public class ChangePhoneFragment extends Fragment {
             UserActionsAPI.confirmChangePhone(
                     codeInputFragmentOld.getCode(),
                     codeInputFragmentNew.getCode(),
-                    (e, response) -> requireActivity().runOnUiThread(() -> onConfirmChange(e, response))
+                    (e, response) -> runOnUiThread(() -> onConfirmChange(e, response))
             );
         } else {
             error.setText(getString(R.string.errorOccured));
@@ -212,19 +180,19 @@ public class ChangePhoneFragment extends Fragment {
             if (errorObject.getString("param").equals("oldPhone"))
                 oldPhoneEdit.setError(errorObject.getString("msg"));
 
-            if(errorObject.getString("param").equals("newPhone"))
+            if (errorObject.getString("param").equals("newPhone"))
                 newPhoneEdit.setError(errorObject.getString("msg"));
 
-            if(errorObject.getString("param").equals("oldCode"))
+            if (errorObject.getString("param").equals("oldCode"))
                 codeInputFragmentOld.showError(errorObject.getString("msg"));
 
-            if(errorObject.getString("param").equals("newCode"))
+            if (errorObject.getString("param").equals("newCode"))
                 codeInputFragmentNew.showError(errorObject.getString("msg"));
         }
     }
 
     private void onChange(Exception e, Response response) {
-        try{
+        try {
             if (e == null && response.isSuccessful()) {
                 //next step
                 isCodeStep = true;
@@ -236,7 +204,7 @@ public class ChangePhoneFragment extends Fragment {
                 codeInputContainerNew.setVisibility(View.VISIBLE);
 
                 error.setVisibility(View.GONE);
-                Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
             } else {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";
@@ -246,11 +214,10 @@ public class ChangePhoneFragment extends Fragment {
                 error.setText(errorText);
                 error.setVisibility(View.VISIBLE);
 
-                if(response != null)
+                if (response != null)
                     showErrors(new JSONObject(response.body().string()).getJSONArray("errors"));
             }
-        }
-        catch (Exception err){
+        } catch (Exception err) {
             //show error
             error.setText(err.getMessage());
             error.setVisibility(View.VISIBLE);
@@ -261,14 +228,14 @@ public class ChangePhoneFragment extends Fragment {
         isLoading = false;
     }
 
-    private void onConfirmChange(Exception e, Response response){
+    private void onConfirmChange(Exception e, Response response) {
         try {
             //parse response
             JSONObject respObj = new JSONObject(response.body().string());
 
             //no errors
             if (e == null && response.isSuccessful()) {
-                Toast.makeText(requireActivity(), getString(R.string.phoneChanged), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.phoneChanged), Toast.LENGTH_SHORT).show();
 
                 //clear form
                 codeInputContainerOld.setVisibility(View.GONE);
@@ -298,9 +265,9 @@ public class ChangePhoneFragment extends Fragment {
         isLoading = false;
     }
 
-    private void onResend(Exception e, Response response){
+    private void onResend(Exception e, Response response) {
         if (e == null && response.isSuccessful()) {
-            Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
         } else {
             //get error
             String errorText = e != null ? e.getMessage() : "";
@@ -312,8 +279,8 @@ public class ChangePhoneFragment extends Fragment {
         }
     }
 
-    private void handleCode(String code){
-        if(isCodeStep)
+    private void handleCode(String code) {
+        if (isCodeStep)
             this.codeInputFragmentOld.setCode(code);
     }
 }

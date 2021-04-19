@@ -1,19 +1,14 @@
-package htmlprogrammer.labs.messanger.fragments;
-
+package htmlprogrammer.labs.messanger;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Patterns;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -27,22 +22,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.UserActionsAPI;
-import htmlprogrammer.labs.messanger.constants.ActionBarType;
 import htmlprogrammer.labs.messanger.constants.CodeTypes;
-import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
-import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
+import htmlprogrammer.labs.messanger.fragments.CodeInputFragment;
+import htmlprogrammer.labs.messanger.interfaces.BaseActivity;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.receivers.CodeReceiver;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import okhttp3.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class SignFragment extends Fragment {
+public class SignActivity extends BaseActivity {
     private EditText nameEdit, nickEdit, phoneEdit;
     private FrameLayout codeInputContainer;
     private TextView back, error, nextButton;
@@ -51,29 +41,35 @@ public class SignFragment extends Fragment {
     private boolean isCodeStep = false;
     private CodeInputFragment codeInputFragment;
 
-    private MeViewModel meVM;
     private MeStore meStore = MeStore.getInstance();
     private CodeReceiver receiver;
 
-    private FragmentManager manager;
     private boolean isLoading = false;
 
-    public SignFragment() { }
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        ActionBarChanged actionBarChanged = (ActionBarChanged) context;
-        actionBarChanged.setActionBarType(ActionBarType.NONE);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign);
 
-        //register sms receiver
         receiver = new CodeReceiver(this::handleCode);
+
+        back = findViewById(R.id.back);
+        error = findViewById(R.id.error);
+        nameEdit = findViewById(R.id.et_name);
+        nickEdit = findViewById(R.id.et_nick);
+        phoneEdit = findViewById(R.id.et_phone);
+        codeInputContainer = findViewById(R.id.codeInputContainerSign);
+        nextButton = findViewById(R.id.next);
+
+        createCodeInput();
+        activateLinks();
+        addValidation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        requireActivity().registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+        registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
     }
 
     @Override
@@ -81,34 +77,7 @@ public class SignFragment extends Fragment {
         super.onPause();
 
         if(receiver != null)
-            requireActivity().unregisterReceiver(receiver);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        manager = requireActivity().getSupportFragmentManager();
-        meVM = ViewModelProviders.of(requireActivity()).get(MeViewModel.class);
-
-        back = view.findViewById(R.id.back);
-        error = view.findViewById(R.id.error);
-        nameEdit = view.findViewById(R.id.et_name);
-        nickEdit = view.findViewById(R.id.et_nick);
-        phoneEdit = view.findViewById(R.id.et_phone);
-        codeInputContainer = view.findViewById(R.id.codeInputContainerSign);
-        nextButton = view.findViewById(R.id.next);
-
-        createCodeInput();
-        activateLinks();
-        addValidation();
+            unregisterReceiver(receiver);
     }
 
     private void createCodeInput(){
@@ -126,12 +95,11 @@ public class SignFragment extends Fragment {
 
         codeInputFragment.setResendCb(() -> {
             UserActionsAPI.resend(phoneEdit.getText().toString(), CodeTypes.SIGNIN.getValue(), (e, response) -> {
-                requireActivity().runOnUiThread(() -> onResend(e, response));
+                runOnUiThread(() -> onResend(e, response));
             });
         });
 
-        requireActivity()
-                .getSupportFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.codeInputContainerSign, codeInputFragment, null)
@@ -141,7 +109,7 @@ public class SignFragment extends Fragment {
     }
 
     private void activateLinks(){
-        back.setOnClickListener(e -> manager.popBackStack());
+        back.setOnClickListener(e -> finish());
     }
 
     private void addValidation(){
@@ -178,7 +146,7 @@ public class SignFragment extends Fragment {
                     nameEdit.getText().toString(),
                     phoneEdit.getText().toString(),
                     nickEdit.getText().toString(),
-                    (e, response) -> requireActivity().runOnUiThread(() -> onSign(e, response)));
+                    (e, response) -> runOnUiThread(() -> onSign(e, response)));
         }
         else{
             //show error
@@ -190,7 +158,7 @@ public class SignFragment extends Fragment {
     private void nextStepTwo(){
         if(codeInputFragment.validate()){
             UserActionsAPI.confirmSignIn(codeInputFragment.getCode(), (e, response) -> {
-                requireActivity().runOnUiThread(() -> onConfirmSign(e, response));
+                runOnUiThread(() -> onConfirmSign(e, response));
             });
 
             error.setVisibility(View.GONE);
@@ -231,7 +199,7 @@ public class SignFragment extends Fragment {
                 codeInputContainer.setVisibility(View.VISIBLE);
 
                 error.setVisibility(View.GONE);
-                Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.newCodeSent), Toast.LENGTH_SHORT).show();
             } else {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";
@@ -258,7 +226,7 @@ public class SignFragment extends Fragment {
 
     private void onResend(Exception e, Response response) {
         if (e == null && response.isSuccessful()) {
-            Toast.makeText(requireActivity(), getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.newCodeSent), Toast.LENGTH_LONG).show();
         } else {
             //get error
             String errorText = e != null ? e.getMessage() : "";
@@ -282,9 +250,14 @@ public class SignFragment extends Fragment {
                 meStore.setToken(respObj.getString("token"));
 
                 //save token to store
-                SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();
+                SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("token", respObj.getString("token"));
                 editor.apply();
+
+                Intent mainIntent = new Intent(this, MainActivity.class);
+                startActivity(mainIntent);
+
+                finish();
             } else {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";
