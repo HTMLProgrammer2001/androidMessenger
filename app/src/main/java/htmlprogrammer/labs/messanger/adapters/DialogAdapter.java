@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -69,12 +70,12 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
             Message message = dialog.getMessage();
 
             if(message != null){
-                dialogViewHolder.showTime(message.getTime());
+                dialogViewHolder.showTime(message.getTimeString());
                 dialogViewHolder.showMessage(message.getMessage());
             }
             else{
                 dialogViewHolder.showTime("");
-                dialogViewHolder.showMessage("Messages were deleted");
+                dialogViewHolder.showMessage(ctx.getString(R.string.messagesDeleted));
             }
         }
     }
@@ -82,6 +83,11 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
     @Override
     public int getItemCount() {
         return Math.max(data.size() + (isLoading ? 1 : 0), 1);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull DialogViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
     }
 
     public void setLoading(boolean isLoading){
@@ -99,6 +105,8 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
         private TextView message;
         private TextView time;
         private TextView unread;
+        private FrameLayout avatar;
+        private int id;
 
         private AppCompatActivity ctx;
 
@@ -112,6 +120,10 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
                 this.message = view.findViewById(R.id.message);
                 this.time = view.findViewById(R.id.time);
                 this.unread = view.findViewById(R.id.unread);
+                this.avatar = view.findViewById(R.id.dialogAvatar);
+                this.id = View.generateViewId();
+
+                this.avatar.setId(id);
             }
             catch (Exception e){}
         }
@@ -143,7 +155,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
 
             this.ctx.getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.avatar, avatarFragment, null)
+                    .replace(id, avatarFragment, null)
                     .commit();
         }
     }

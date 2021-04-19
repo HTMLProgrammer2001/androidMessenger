@@ -1,7 +1,6 @@
 package htmlprogrammer.labs.messanger.fragments.common;
 
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,13 +9,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
-
+import de.hdodenhof.circleimageview.CircleImageView;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.dialogs.ImageDialog;
 
@@ -24,7 +21,7 @@ import htmlprogrammer.labs.messanger.dialogs.ImageDialog;
  * A simple {@link Fragment} subclass.
  */
 public class UserAvatar extends Fragment {
-    private ImageView imgView;
+    private CircleImageView imgView;
     private TextView shortNameView;
     private ConstraintLayout root;
 
@@ -91,14 +88,14 @@ public class UserAvatar extends Fragment {
         this.name = name;
         this.imgURL = imgURL;
 
-        if(imgView == null)
+        if(root == null)
             return;
 
-        if(hasImg){
+        if(hasImg && imgView != null){
             //show image
             Picasso.get().load(imgURL).into(imgView);
 
-            root.setBackgroundColor(Color.TRANSPARENT);
+            root.setBackground(null);
             shortNameView.setVisibility(View.INVISIBLE);
             imgView.setVisibility(View.VISIBLE);
         }
@@ -112,7 +109,7 @@ public class UserAvatar extends Fragment {
             }
 
             //show name
-            root.setBackgroundColor(getResources().getColor(R.color.bgGreen));
+            root.setBackground(getResources().getDrawable(R.drawable.bg_round));
             shortNameView.setText(shortName);
 
             shortNameView.setVisibility(View.VISIBLE);

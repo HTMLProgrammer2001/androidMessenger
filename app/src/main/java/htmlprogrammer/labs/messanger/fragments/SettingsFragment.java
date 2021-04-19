@@ -7,10 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,9 +24,6 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.EditMeAPI;
@@ -41,7 +36,8 @@ import htmlprogrammer.labs.messanger.dialogs.NickChangeDialog;
 import htmlprogrammer.labs.messanger.fragments.common.UserAvatar;
 import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.models.User;
-import htmlprogrammer.labs.messanger.store.MeState;
+import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import okhttp3.Response;
 
 /**
@@ -63,7 +59,8 @@ public class SettingsFragment extends Fragment {
     private LinearLayout uploader;
     private Switch notificationSwitch;
 
-    private MeState meState;
+    private MeViewModel meVM;
+    private MeStore meStore = MeStore.getInstance();
     private UserAvatar avatarFragment;
     private ActionBarChanged actionBarChanged;
 
@@ -92,8 +89,10 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //get state
-        meState = ViewModelProviders.of(requireActivity()).get(MeState.class);
-        avatarFragment = UserAvatar.getInstance("", "");
+        meVM = ViewModelProviders.of(requireActivity()).get(MeViewModel.class);
+
+        User user = meVM.getUser().getValue();
+        avatarFragment = UserAvatar.getInstance(user.getFullName(), user.getAvatar());
 
         //find elements
         name = view.findViewById(R.id.name);
@@ -118,7 +117,7 @@ public class SettingsFragment extends Fragment {
         requireActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.avatar, avatarFragment, null)
+                .replace(R.id.profileAvatar, avatarFragment, null)
                 .commit();
 
         addHandlers();
@@ -144,7 +143,7 @@ public class SettingsFragment extends Fragment {
                 File file = new File(filePath);
 
                 //save on server
-                EditMeAPI.editAvatar(pref.getString("token", ""), file, this::onPhotoChanged);
+                EditMeAPI.editAvatar(meStore.getToken(), file, this::onPhotoChanged);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -161,7 +160,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void addHandlers(){
-        meState.getUser().observe(requireActivity(), (User user) -> {
+        meVM.getUser().observe(requireActivity(), (User user) -> {
             if(user == null)
                 return;
 
@@ -241,8 +240,8 @@ public class SettingsFragment extends Fragment {
         UserActionsAPI.logout(pref.getString("token", ""), (e, response) -> {});
 
         //logout
-        meState.setUser(null);
-        meState.setToken(null);
+        meStore.setUser(null);
+        meStore.setToken(null);
 
         //delete from shared preference
         SharedPreferences.Editor editor = pref.edit();
@@ -265,7 +264,7 @@ public class SettingsFragment extends Fragment {
                 JSONObject respObj = new JSONObject(response.body().string());
 
                 //change me
-                meState.setUser(User.fromJSON(respObj.getJSONObject("newUser")));
+                meStore.setUser(User.fromJSON(respObj.getJSONObject("newUser")));
             } else {
                 //show error
                 requireActivity().runOnUiThread(() -> {

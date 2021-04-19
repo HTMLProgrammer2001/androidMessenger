@@ -24,8 +24,8 @@ public class CodeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                if(!smsMessage.getDisplayMessageBody().equals(BuildConfig.SMS_SENDER))
-                    return;
+//                if(!smsMessage.getDisplayOriginatingAddress().equals(BuildConfig.SMS_SENDER))
+//                    return;
 
                 Matcher matcher = Pattern.compile("\\d+").matcher(smsMessage.getMessageBody());
 

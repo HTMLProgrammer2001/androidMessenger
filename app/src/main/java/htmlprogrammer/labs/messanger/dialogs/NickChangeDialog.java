@@ -2,7 +2,6 @@ package htmlprogrammer.labs.messanger.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,21 +16,19 @@ import org.json.JSONObject;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.EditMeAPI;
 import htmlprogrammer.labs.messanger.models.User;
-import htmlprogrammer.labs.messanger.store.MeState;
+import htmlprogrammer.labs.messanger.store.MeStore;
 import okhttp3.Response;
 
 public class NickChangeDialog extends DialogFragment {
     private EditText nickEdit;
     private AwesomeValidation validation;
-    private MeState meState;
+    private MeStore meStore = MeStore.getInstance();
     private AlertDialog dialog;
     private boolean isLoading;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        meState = ViewModelProviders.of(requireActivity()).get(MeState.class);
-
         //create input
         nickEdit = new EditText(getContext());
         nickEdit.setHint(R.string.enterNick);
@@ -77,7 +74,7 @@ public class NickChangeDialog extends DialogFragment {
                 JSONObject respObj = new JSONObject(response.body().string());
 
                 //change me
-                meState.setUser(User.fromJSON(respObj.getJSONObject("newUser")));
+                meStore.setUser(User.fromJSON(respObj.getJSONObject("newUser")));
 
                 if(dialog != null)
                     dialog.dismiss();

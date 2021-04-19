@@ -17,21 +17,20 @@ import org.json.JSONObject;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.EditMeAPI;
 import htmlprogrammer.labs.messanger.models.User;
-import htmlprogrammer.labs.messanger.store.MeState;
+import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import okhttp3.Response;
 
 public class NameChangeDialog extends DialogFragment {
     private EditText nameEdit;
     private AwesomeValidation validation;
-    private MeState meState;
+    private MeStore meStore = MeStore.getInstance();
     private AlertDialog dialog;
     private boolean isLoading;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        meState = ViewModelProviders.of(requireActivity()).get(MeState.class);
-
         //create input
         nameEdit = new EditText(getContext());
         nameEdit.setHint(R.string.enterName);
@@ -77,7 +76,7 @@ public class NameChangeDialog extends DialogFragment {
                 JSONObject respObj = new JSONObject(response.body().string());
 
                 //change me
-                meState.setUser(User.fromJSON(respObj.getJSONObject("newUser")));
+                meStore.setUser(User.fromJSON(respObj.getJSONObject("newUser")));
 
                 if(dialog != null)
                     dialog.dismiss();

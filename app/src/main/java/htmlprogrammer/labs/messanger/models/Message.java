@@ -2,24 +2,34 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 
 public class Message {
     private String id;
     private String message;
     private MessageTypes type;
-    private String time;
+    private Date time;
     private boolean readed;
     private int size = 0;
     private String url = null;
 
     public static Message fromJSON(JSONObject obj){
         Message message = new Message();
+        Date time = null;
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            time = format.parse(obj.getString("time"));
+        }
+        catch (Exception e){ }
 
         try{
             message.setId(obj.getString("_id"));
             message.setMessage(obj.getString("message"));
-            message.setTime(obj.getString("time"));
+            message.setTime(time);
             message.setType(MessageTypes.fromInt(obj.getInt("type")));
             message.setReaded(obj.optBoolean("readed", false));
             message.setSize(obj.optInt("size", 0));
@@ -54,11 +64,20 @@ public class Message {
         this.type = type;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public String getTimeString(){
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+        if(time != null)
+            return outputFormat.format(time);
+
+        return "";
+    }
+
+    public void setTime(Date time) {
         this.time = time;
     }
 

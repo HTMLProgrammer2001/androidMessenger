@@ -10,12 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -37,7 +35,8 @@ import htmlprogrammer.labs.messanger.fragments.common.CodeInputFragment;
 import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.receivers.CodeReceiver;
-import htmlprogrammer.labs.messanger.store.MeState;
+import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import okhttp3.Response;
 
 /**
@@ -52,7 +51,8 @@ public class SignFragment extends Fragment {
     private boolean isCodeStep = false;
     private CodeInputFragment codeInputFragment;
 
-    private MeState meState;
+    private MeViewModel meVM;
+    private MeStore meStore = MeStore.getInstance();
     private CodeReceiver receiver;
 
     private FragmentManager manager;
@@ -96,7 +96,7 @@ public class SignFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         manager = requireActivity().getSupportFragmentManager();
-        meState = ViewModelProviders.of(requireActivity()).get(MeState.class);
+        meVM = ViewModelProviders.of(requireActivity()).get(MeViewModel.class);
 
         back = view.findViewById(R.id.back);
         error = view.findViewById(R.id.error);
@@ -278,8 +278,8 @@ public class SignFragment extends Fragment {
             //no errors
             if (e == null && response.isSuccessful()) {
                 //save user
-                meState.setUser(User.fromJSON(respObj.getJSONObject("user")));
-                meState.setToken(respObj.getString("token"));
+                meStore.setUser(User.fromJSON(respObj.getJSONObject("user")));
+                meStore.setToken(respObj.getString("token"));
 
                 //save token to store
                 SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", 0).edit();

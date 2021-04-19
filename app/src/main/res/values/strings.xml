@@ -59,4 +59,5 @@
     <string name="reload">Reload app</string>
 
     <string name="noDialogs">No dialogs</string>
+    <string name="messagesDeleted">Messages were deleted</string>
 </resources>

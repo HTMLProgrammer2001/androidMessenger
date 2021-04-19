@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,9 +25,11 @@ import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.adapters.DialogAdapter;
 import htmlprogrammer.labs.messanger.api.SearchAPI;
 import htmlprogrammer.labs.messanger.constants.ActionBarType;
+import htmlprogrammer.labs.messanger.helpers.SwipeDetector;
 import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.models.Dialog;
-import htmlprogrammer.labs.messanger.store.SearchState;
+import htmlprogrammer.labs.messanger.store.SearchStore;
+import htmlprogrammer.labs.messanger.viewmodels.SearchViewModel;
 import okhttp3.Response;
 
 /**
@@ -35,7 +39,9 @@ public class MainFragment extends Fragment {
     private RecyclerView list;
 
     private DialogAdapter adapter;
-    private SearchState searchState;
+    private SearchViewModel searchVM;
+    private SearchStore searchStore = SearchStore.getInstance();
+    private GestureDetectorCompat detector;
 
     public MainFragment() { }
 
@@ -45,14 +51,25 @@ public class MainFragment extends Fragment {
         ActionBarChanged actionBarChanged = (ActionBarChanged) context;
         actionBarChanged.setActionBarType(ActionBarType.TOOLBAR);
 
-        searchState = ViewModelProviders.of(requireActivity()).get(SearchState.class);
+        searchVM = ViewModelProviders.of(requireActivity()).get(SearchViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+
+        view.setOnTouchListener((v, event) -> {
+            if(event.getAction() == MotionEvent.ACTION_MOVE)
+                detector.onTouchEvent(event);
+            else if(event.getAction() == MotionEvent.ACTION_DOWN)
+                view.performClick();
+
+            return true;
+        });
+
+        return view;
     }
 
     @Override
@@ -61,14 +78,34 @@ public class MainFragment extends Fragment {
 
         list = view.findViewById(R.id.list);
 
-        initList();
+        initUI();
         addHandlers();
         startLoading();
     }
 
+    private void initUI(){
+        initList();
+        initSwipe();
+    }
+
+    private void initSwipe(){
+        detector = new GestureDetectorCompat(requireActivity(), new SwipeDetector() {
+            @Override
+            public boolean onSwipe(Direction direction) {
+                System.out.println(direction);
+                return false;
+            }
+
+            @Override
+            public boolean validate(MotionEvent e1, MotionEvent e2, float velX, float velY) {
+                return velY > 0;
+            }
+        });
+    }
+
     private void addHandlers(){
-        searchState.getDialogs().observe(requireActivity(), (dialogs) -> adapter.setData(dialogs));
-        searchState.getLoading().observe(requireActivity(), (isLoading) -> adapter.setLoading(isLoading));
+        searchVM.getDialogs().observe(requireActivity(), (dialogs) -> adapter.setData(dialogs));
+        searchVM.getLoading().observe(requireActivity(), (isLoading) -> adapter.setLoading(isLoading));
     }
 
     private void initList(){
@@ -81,8 +118,8 @@ public class MainFragment extends Fragment {
     }
 
     private void startLoading(){
-        searchState.startLoading();
-        searchState.setDialogs(new ArrayList<>());
+        searchStore.startLoading();
+        searchStore.setDialogs(new ArrayList<>());
 
         //get token
         SharedPreferences pref = requireActivity().getSharedPreferences("store", 0);
@@ -91,14 +128,14 @@ public class MainFragment extends Fragment {
 
     private void onLoaded(Exception e, Response response){
         //stop loading
-        searchState.setIsLoading(false);
+        searchStore.stopLoading();
 
         if(e != null || !response.isSuccessful()){
             //get error
             String errorText = e != null ? e.getMessage() : "";
             errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
 
-            searchState.setError(errorText);
+            searchStore.setError(errorText);
         }
         else{
             try {
@@ -113,7 +150,7 @@ public class MainFragment extends Fragment {
                 }
 
                 //add it to state
-                searchState.addDialogs(newDialogs);
+                searchStore.addDialogs(newDialogs);
             } catch (Exception err) {
                 err.printStackTrace();
             }

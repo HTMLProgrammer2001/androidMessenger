@@ -27,10 +27,10 @@ import htmlprogrammer.labs.messanger.helpers.LanguageHelper;
 import htmlprogrammer.labs.messanger.interfaces.ActionBarChanged;
 import htmlprogrammer.labs.messanger.interfaces.DrawerClosable;
 import htmlprogrammer.labs.messanger.models.User;
-import htmlprogrammer.labs.messanger.store.MeState;
+import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 
 public class MainActivity extends AppCompatActivity implements DrawerClosable, ActionBarChanged {
-    private MeState meState;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBar bar;
@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
 
     private UserAvatar userAvatarFragment;
     private boolean isMain = false;
+    private MeViewModel meVM;
+    private MeStore meStore = MeStore.getInstance();
 
 
     @Override
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
         //init listeners
         navigationView.setNavigationItemSelectedListener(this::onNavigationSelect);
 
-        meState = ViewModelProviders.of(this).get(MeState.class);
+        meVM = ViewModelProviders.of(this).get(MeViewModel.class);
 
         initMe();
         subscribe();
@@ -146,21 +148,22 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
     }
 
     private void initMe() {
-        meState.setLoading(true);
-
         SharedPreferences prefs = getSharedPreferences("store", 0);
+        meStore.startLoading();
+        meStore.setToken(prefs.getString("token", ""));
+
         UserActionsAPI.getMe(prefs.getString("token", ""), (err, response) -> {
             //error in loading
             if (err != null || !response.isSuccessful()) {
-                meState.setLoading(false);
+                meStore.stopLoading();
                 return;
             }
 
             try {
                 //parse response
                 JSONObject userObj = new JSONObject(response.body().string());
-                meState.setLoading(false);
-                meState.setUser(User.fromJSON(userObj));
+                meStore.stopLoading();
+                meStore.setUser(User.fromJSON(userObj));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -168,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
     }
 
     private void subscribe() {
-        meState.getUser().observe(this, (user) -> {
+        meVM.getUser().observe(this, (user) -> {
             if (user == null) {
                 redirectToLogin();
                 isMain = false;
@@ -196,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements DrawerClosable, A
             phone.setText(user.getPhone());
         });
 
-        meState.getLoadingData().observe(this, isLoading -> {
+        meVM.getLoadingData().observe(this, isLoading -> {
             if (isLoading) {
                 getSupportFragmentManager()
                         .beginTransaction()

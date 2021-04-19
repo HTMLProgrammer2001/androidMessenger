@@ -47,7 +47,6 @@ public class ChangePhoneFragment extends Fragment {
     private AwesomeValidation validation;
     private CodeInputFragment codeInputFragmentOld, codeInputFragmentNew;
     private CodeReceiver receiver;
-    private LocalBroadcastManager manager;
 
     private boolean isCodeStep = false;
     private boolean isLoading = false;
