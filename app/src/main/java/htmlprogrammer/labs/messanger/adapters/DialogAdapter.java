@@ -11,7 +11,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.fragments.UserAvatar;
@@ -19,7 +21,7 @@ import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.Message;
 
 public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogViewHolder> {
-    private List<Dialog> data = new ArrayList<>();
+    private ArrayList<Dialog> data = new ArrayList<>();
     private LayoutInflater inflater;
     private AppCompatActivity ctx;
     private boolean isLoading = false;
@@ -62,7 +64,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
     @Override
     public void onBindViewHolder(@NonNull DialogViewHolder dialogViewHolder, int i) {
         if(data.size() > 0 && data.size() != i){
-            Dialog dialog = data.get(i);
+            Dialog dialog = (Dialog) data.toArray()[i];
             dialogViewHolder.showName(dialog.getName());
             dialogViewHolder.showAvatar(dialog.getName(), dialog.getAvatar());
             dialogViewHolder.showUnread(dialog.getUnread());
@@ -85,13 +87,26 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.DialogView
         return Math.max(data.size() + (isLoading ? 1 : 0), 1);
     }
 
+    @Override
+    public long getItemId(int position) {
+        Dialog dialog = (Dialog) data.toArray()[position];
+        return dialog.getId().hashCode();
+    }
+
     public void setLoading(boolean isLoading){
         this.isLoading = isLoading;
         this.notifyDataSetChanged();
     }
 
-    public void setData(ArrayList<Dialog> data){
-        this.data = data;
+    public void setData(TreeSet<Dialog> data){
+        Object[] arr = data.toArray();
+        ArrayList<Dialog> dialogs = new ArrayList<>();
+
+        for(Object dialog : arr){
+            dialogs.add((Dialog) dialog);
+        }
+
+        this.data = dialogs;
         this.notifyDataSetChanged();
     }
 

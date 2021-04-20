@@ -2,6 +2,7 @@ package htmlprogrammer.labs.messanger;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -73,6 +74,8 @@ public class DialogsActivity extends BaseActivity {
 
         initList();
         subscribe();
+
+        searchStore.reset();
         startLoading();
     }
 
@@ -84,8 +87,10 @@ public class DialogsActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.reload)
+        if(item.getItemId() == R.id.reload) {
+            searchStore.reset();
             startLoading();
+        }
         else
             toggleSidebar();
 
@@ -103,10 +108,17 @@ public class DialogsActivity extends BaseActivity {
 
     private void startLoading(){
         searchStore.startLoading();
-        searchStore.setDialogs(new ArrayList<>());
+
+        MeStore meStore = MeStore.getInstance();
+        SearchStore searchStore = SearchStore.getInstance();
 
         //get dialogs
-        SearchAPI.getDialogsByName(MeStore.getInstance().getToken(), "", this::onLoaded);
+        SearchAPI.getDialogsByName(meStore.getToken(),
+                searchStore.getSearchText(),
+                searchStore.getCurPage() + 1,
+                searchStore.getPageSize(),
+                this::onLoaded
+        );
     }
 
     private void onLoaded(Exception e, Response response){
@@ -133,6 +145,8 @@ public class DialogsActivity extends BaseActivity {
                 }
 
                 //add it to state
+                searchStore.setCurPage(object.getInt("page"));
+                searchStore.setTotalPages(object.getInt("totalPages"));
                 searchStore.addDialogs(newDialogs);
             } catch (Exception err) {
                 err.printStackTrace();
@@ -166,6 +180,11 @@ public class DialogsActivity extends BaseActivity {
     }
 
     private void subscribe() {
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(() -> {
+            if(!scrollView.canScrollVertically(20) && !searchStore.getLoading() && searchStore.hasMore())
+                startLoading();
+        });
+
         searchVM.getDialogs().observe(this, (dialogs) -> adapter.setData(dialogs));
         searchVM.getLoading().observe(this, (isLoading) -> adapter.setLoading(isLoading));
 
