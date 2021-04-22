@@ -7,7 +7,7 @@ import java.util.Date;
 
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 
-public class Message {
+public class Message implements Comparable<Message> {
     private String id;
     private String message;
     private MessageTypes type;
@@ -15,6 +15,29 @@ public class Message {
     private boolean readed;
     private int size = 0;
     private String url = null;
+
+    @Override
+    public int compareTo(Message otherMessage) {
+        if (getId().equals(otherMessage.getId()))
+            return 0;
+
+        return getTime().compareTo(otherMessage.getTime());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Dialog) {
+            Dialog otherDialog = (Dialog) obj;
+            return getId().equals(otherDialog.getId());
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
 
     public static Message fromJSON(JSONObject obj){
         Message message = new Message();

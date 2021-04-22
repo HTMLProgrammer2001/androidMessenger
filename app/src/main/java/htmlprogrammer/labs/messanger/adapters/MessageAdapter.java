@@ -12,18 +12,17 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.R;
-import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.Message;
 
-public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
-    private ArrayList<Dialog> data = new ArrayList<>();
+public class MessageAdapter extends RecyclerView.Adapter<SearchViewHolder> {
+    private ArrayList<Message> data = new ArrayList<>();
     private LayoutInflater inflater;
     private AppCompatActivity ctx;
 
     private static int EMPTY_TYPE = 1;
     private static int LIST_TYPE = 2;
 
-    public DialogAdapter(Context ctx){
+    public MessageAdapter(Context ctx){
         this.ctx = (AppCompatActivity) ctx;
         this.inflater = LayoutInflater.from(ctx);
     }
@@ -51,21 +50,12 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder dialogViewHolder, int i) {
         if(data.size() > 0 && data.size() != i){
-            Dialog dialog = data.get(i);
-            dialogViewHolder.showName(dialog.getName());
-            dialogViewHolder.showAvatar(dialog.getName(), dialog.getAvatar());
-            dialogViewHolder.showUnread(dialog.getUnread());
+            Message message = data.get(i);
+            dialogViewHolder.showName("Name");
+            dialogViewHolder.showAvatar("Name", null);
 
-            Message message = dialog.getMessage();
-
-            if(message != null){
-                dialogViewHolder.showTime(message.getTimeString());
-                dialogViewHolder.showMessage(message.getMessage());
-            }
-            else{
-                dialogViewHolder.showTime("");
-                dialogViewHolder.showMessage(ctx.getString(R.string.messagesDeleted));
-            }
+            dialogViewHolder.showTime(message.getTimeString());
+            dialogViewHolder.showMessage(message.getMessage());
         }
     }
 
@@ -76,19 +66,18 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
     @Override
     public long getItemId(int position) {
-        Dialog dialog = data.get(position);
-        return dialog.getId().hashCode();
+        return data.get(position).getId().hashCode();
     }
 
-    public void setData(TreeSet<Dialog> data){
+    public void setData(TreeSet<Message> data){
         Object[] arr = data.toArray();
-        ArrayList<Dialog> dialogs = new ArrayList<>();
+        ArrayList<Message> messages = new ArrayList<>();
 
-        for(Object dialog : arr){
-            dialogs.add((Dialog) dialog);
+        for(Object msg : arr){
+            messages.add((Message) msg);
         }
 
-        this.data = dialogs;
+        this.data = messages;
         this.notifyDataSetChanged();
     }
 }
