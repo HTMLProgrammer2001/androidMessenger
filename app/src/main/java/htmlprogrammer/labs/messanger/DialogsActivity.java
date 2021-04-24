@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import htmlprogrammer.labs.messanger.api.SearchAPI;
+import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.constants.SearchTypes;
 import htmlprogrammer.labs.messanger.dialogs.InfoDialog;
 import htmlprogrammer.labs.messanger.fragments.UserAvatar;
@@ -37,7 +38,7 @@ import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import htmlprogrammer.labs.messanger.viewmodels.search.SearchViewModel;
 import okhttp3.Response;
 
-public class DialogsActivity extends BaseActivity {
+public class DialogsActivity extends BaseActivity{
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBar bar;
@@ -139,6 +140,14 @@ public class DialogsActivity extends BaseActivity {
             toggleSidebar();
 
         return true;
+    }
+
+    public void openDialog(String nick, ChatTypes chatTypes){
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("nick", nick);
+        intent.putExtra("type", chatTypes);
+
+        startActivity(intent);
     }
 
     private void startUserLoading(){

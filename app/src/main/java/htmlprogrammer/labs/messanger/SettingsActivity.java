@@ -222,6 +222,10 @@ public class SettingsActivity extends BaseActivity {
 
         editor.remove("token");
         editor.apply();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void uploadPhoto(View view){

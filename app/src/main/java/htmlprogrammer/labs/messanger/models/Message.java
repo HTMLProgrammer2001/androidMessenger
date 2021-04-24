@@ -12,6 +12,7 @@ public class Message implements Comparable<Message> {
     private String message;
     private MessageTypes type;
     private Date time;
+    private Dialog dialog;
     private boolean readed;
     private int size = 0;
     private String url = null;
@@ -57,6 +58,9 @@ public class Message implements Comparable<Message> {
             message.setReaded(obj.optBoolean("readed", false));
             message.setSize(obj.optInt("size", 0));
             message.setUrl(obj.optString("url", null));
+
+            if(obj.optJSONObject("dialog") != null)
+                message.setDialog(Dialog.fromJSON(obj.optJSONObject("dialog"), false));
         }
         catch (Exception e){}
 
@@ -126,5 +130,13 @@ public class Message implements Comparable<Message> {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Dialog getDialog() {
+        return dialog;
+    }
+
+    public void setDialog(Dialog dialog) {
+        this.dialog = dialog;
     }
 }

@@ -65,4 +65,6 @@
     <string name="user">User</string>
     <string name="noData">No data was found</string>
     <string name="loadMore"><u>Load more</u></string>
+
+    <string name="participants">%1$d participants</string>
 </resources>

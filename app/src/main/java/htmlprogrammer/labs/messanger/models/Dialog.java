@@ -48,7 +48,11 @@ public class Dialog implements Comparable<Dialog> {
         return getId().hashCode();
     }
 
-    public static Dialog fromJSON(JSONObject obj) {
+    public static Dialog fromJSON(JSONObject obj){
+        return fromJSON(obj, true);
+    }
+
+    public static Dialog fromJSON(JSONObject obj, boolean withMessage) {
         Dialog dialog = new Dialog();
 
         try {
@@ -60,7 +64,7 @@ public class Dialog implements Comparable<Dialog> {
             dialog.setType(DialogTypes.fromInt(obj.getInt("type")));
             dialog.setAvatar(obj.optString("avatar", null));
 
-            if (obj.optJSONObject("lastMessage") != null) {
+            if (obj.optJSONObject("lastMessage") != null && withMessage) {
                 dialog.setMessage(Message.fromJSON(obj.getJSONObject("lastMessage")));
             }
         } catch (Exception e) {

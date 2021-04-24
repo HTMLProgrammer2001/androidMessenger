@@ -23,7 +23,7 @@ android {
             buildConfigField "String", "SMS_SENDER", '"Messanger"'
         }
 
-        debug{
+        debug {
             buildConfigField "String", "API_URL", '"http://192.168.0.150:5000"'
 //            buildConfigField "String", "API_URL", '"https://messanger.click/api"'
             buildConfigField "String", "SMS_SENDER", '"Messanger"'

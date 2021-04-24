@@ -11,20 +11,22 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import htmlprogrammer.labs.messanger.DialogsActivity;
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.Message;
 
 public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     private ArrayList<Dialog> data = new ArrayList<>();
     private LayoutInflater inflater;
-    private AppCompatActivity ctx;
+    private DialogsActivity ctx;
 
     private static int EMPTY_TYPE = 1;
     private static int LIST_TYPE = 2;
 
     public DialogAdapter(Context ctx){
-        this.ctx = (AppCompatActivity) ctx;
+        this.ctx = (DialogsActivity) ctx;
         this.inflater = LayoutInflater.from(ctx);
     }
 
@@ -66,6 +68,8 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
                 dialogViewHolder.showTime("");
                 dialogViewHolder.showMessage(ctx.getString(R.string.messagesDeleted));
             }
+
+            dialogViewHolder.setOnClick(v -> ctx.openDialog(dialog.getNick(), ChatTypes.DIALOG));
         }
     }
 

@@ -56,4 +56,14 @@ public class SearchAPI extends ApiClass {
 
         makeCall(request, callback);
     }
+
+    public static void getDialogByNickname(String token, String nick, APICallback callback){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BuildConfig.API_URL + "/dialogs/nickname/" + nick).newBuilder();
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build().toString())
+                .addHeader("Authorization", "Bearer " + token).get().build();
+
+        makeCall(request, callback);
+    }
 }

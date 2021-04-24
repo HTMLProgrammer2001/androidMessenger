@@ -65,4 +65,6 @@
     <string name="user">Пользователь</string>
     <string name="noData">Данные не найдены</string>
     <string name="loadMore"><u>Загрузить ещё</u></string>
+
+    <string name="participants">%1$d участников</string>
 </resources>

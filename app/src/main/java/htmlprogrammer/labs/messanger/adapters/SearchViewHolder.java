@@ -1,5 +1,6 @@
 package htmlprogrammer.labs.messanger.adapters;
 
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -15,6 +16,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
     private TextView time;
     private TextView unread;
     private FrameLayout avatar;
+    private ConstraintLayout root;
     private int id;
 
     private AppCompatActivity ctx;
@@ -25,6 +27,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
         this.ctx = ctx;
 
         try {
+            this.root = view.findViewById(R.id.root);
             this.name = view.findViewById(R.id.name);
             this.message = view.findViewById(R.id.message);
             this.time = view.findViewById(R.id.time);
@@ -66,5 +69,9 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
                 .beginTransaction()
                 .replace(id, avatarFragment, null)
                 .commit();
+    }
+
+    void setOnClick(View.OnClickListener listener){
+        this.root.setOnClickListener(listener);
     }
 }

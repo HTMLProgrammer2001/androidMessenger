@@ -2,7 +2,6 @@ package htmlprogrammer.labs.messanger.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,19 +10,21 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import htmlprogrammer.labs.messanger.DialogsActivity;
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.models.Message;
 
 public class MessageAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     private ArrayList<Message> data = new ArrayList<>();
     private LayoutInflater inflater;
-    private AppCompatActivity ctx;
+    private DialogsActivity ctx;
 
     private static int EMPTY_TYPE = 1;
     private static int LIST_TYPE = 2;
 
     public MessageAdapter(Context ctx){
-        this.ctx = (AppCompatActivity) ctx;
+        this.ctx = (DialogsActivity) ctx;
         this.inflater = LayoutInflater.from(ctx);
     }
 
@@ -51,11 +52,13 @@ public class MessageAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     public void onBindViewHolder(@NonNull SearchViewHolder dialogViewHolder, int i) {
         if(data.size() > 0 && data.size() != i){
             Message message = data.get(i);
-            dialogViewHolder.showName("Name");
-            dialogViewHolder.showAvatar("Name", null);
+            dialogViewHolder.showName(message.getDialog().getName());
+            dialogViewHolder.showAvatar(message.getDialog().getName(), message.getDialog().getAvatar());
 
             dialogViewHolder.showTime(message.getTimeString());
             dialogViewHolder.showMessage(message.getMessage());
+
+            dialogViewHolder.setOnClick(v -> ctx.openDialog(message.getDialog().getNick(), ChatTypes.DIALOG));
         }
     }
 

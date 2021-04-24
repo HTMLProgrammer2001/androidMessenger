@@ -15,7 +15,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DialogsActivity"></activity>
+        <activity android:name=".ChatActivity" android:theme="@style/WithoutActionBar"/>
+        <activity android:name=".DialogsActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ChangePhoneActivity" />
         <activity android:name=".SignActivity" />
@@ -23,6 +24,7 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
