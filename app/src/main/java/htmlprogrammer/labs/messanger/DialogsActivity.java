@@ -97,11 +97,10 @@ public class DialogsActivity extends BaseActivity {
                 searchStore.setSearchText(query);
                 startDialogsLoading();
 
-                if(query == null || query.isEmpty())
-                    startMessagesLoading();
-
                 if(query != null && query.startsWith("@"))
                     startUserLoading();
+                else if(query != null && !query.isEmpty())
+                    startMessagesLoading();
 
                 return true;
             }
@@ -175,7 +174,7 @@ public class DialogsActivity extends BaseActivity {
         }
     }
 
-    private void startMessagesLoading(){
+    public void startMessagesLoading(){
         searchMessagesStore.startLoading();
 
         //get dialogs
@@ -220,7 +219,7 @@ public class DialogsActivity extends BaseActivity {
         }
     }
 
-    private void startDialogsLoading(){
+    public void startDialogsLoading(){
         searchDialogsStore.startLoading();
         SearchTypes type = searchVM.getSearchType().getValue();
 

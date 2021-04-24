@@ -20,13 +20,18 @@ import htmlprogrammer.labs.messanger.helpers.LanguageHelper;
 public class LanguageDialog extends DialogFragment {
     private int language_index;
     private List<String> languageCodes;
-    private SharedPreferences pref;
+    private static SharedPreferences pref;
+
+    public static LanguageDialog getInstance(SharedPreferences pref){
+        LanguageDialog.pref = pref;
+        LanguageDialog dialog = new LanguageDialog();
+        return dialog;
+    }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         languageCodes = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.languageCodes)));
-        pref = requireActivity().getSharedPreferences("store", 0);
 
         //get current language
         String currentLanguage = pref.getString("language", "en");

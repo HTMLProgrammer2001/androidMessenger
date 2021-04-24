@@ -2,6 +2,7 @@ package htmlprogrammer.labs.messanger.fragments.dialogsFragments;
 
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import htmlprogrammer.labs.messanger.DialogsActivity;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.adapters.DialogAdapter;
 import htmlprogrammer.labs.messanger.api.SearchAPI;
@@ -36,15 +38,24 @@ import okhttp3.Response;
 public class DialogsFragment extends Fragment {
     private SearchDialogsViewModel searchDialogsVM;
     private SearchViewModel searchVM;
+    private SearchDialogsStore searchDialogsStore = SearchDialogsStore.getInstance();
     private DialogAdapter adapter;
+
+    private DialogsActivity activity;
 
     private RecyclerView list;
     private TextView title;
     private TextView error;
     private TextView loading;
+    private TextView loadMore;
 
     public DialogsFragment() { }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (DialogsActivity) context;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +72,7 @@ public class DialogsFragment extends Fragment {
         title = view.findViewById(R.id.title);
         error = view.findViewById(R.id.error);
         loading = view.findViewById(R.id.loading);
+        loadMore = view.findViewById(R.id.loadMore);
 
         adapter = new DialogAdapter(requireActivity());
 
@@ -69,22 +81,34 @@ public class DialogsFragment extends Fragment {
         list.setLayoutManager(layoutManager);
         list.setAdapter(adapter);
 
+        loadMore.setVisibility(View.GONE);
+
         addHandlers();
     }
 
     private void addHandlers(){
         searchVM.getSearchType().observe(this, type -> {
             title.setVisibility(type.equals(SearchTypes.DEFAULT) ? View.GONE : View.VISIBLE);
+            loadMore.setVisibility(type.equals(SearchTypes.DEFAULT) ? View.GONE : View.VISIBLE);
         });
 
         searchDialogsVM.getLoading().observe(this, isLoading -> {
             loading.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            boolean isAppear = searchDialogsStore.hasMore() && !searchVM.getSearchType().equals(SearchTypes.DEFAULT);
+            loadMore.setVisibility(isAppear ? View.VISIBLE : View.GONE);
         });
 
         searchDialogsVM.getError().observe(this, errorStr -> {
             error.setVisibility(errorStr == null || errorStr.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
-        searchDialogsVM.getDialogs().observe(this, dialogs -> adapter.setData(dialogs));
+        searchDialogsVM.getDialogs().observe(this, dialogs -> {
+            if(dialogs.size() == 0)
+                loadMore.setVisibility(View.GONE);
+
+            adapter.setData(dialogs);
+        });
+
+        loadMore.setOnClickListener((view) -> activity.startDialogsLoading());
     }
 }

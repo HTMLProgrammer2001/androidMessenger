@@ -178,7 +178,7 @@ public class SettingsActivity extends BaseActivity {
 
     private void changeLanguage(View view){
         //show dialog
-        LanguageDialog dialog = new LanguageDialog();
+        LanguageDialog dialog = LanguageDialog.getInstance(preferences);
         dialog.show(getSupportFragmentManager(), "changeLanguage");
     }
 

@@ -59,4 +59,10 @@
     <string name="reload">Перезапустите приложение</string>
 
     <string name="noDialogs">Нет диалогов</string>
+    <string name="messagesDeleted">Сообщения удалены</string>
+    <string name="dialogs">Диалоги</string>
+    <string name="messages">Сообщения</string>
+    <string name="user">Пользователь</string>
+    <string name="noData">Данные не найдены</string>
+    <string name="loadMore"><u>Загрузить ещё</u></string>
 </resources>

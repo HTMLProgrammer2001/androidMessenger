@@ -64,5 +64,5 @@
     <string name="messages">Messages</string>
     <string name="user">User</string>
     <string name="noData">No data was found</string>
-    <string name="loadMore">Load more</string>
+    <string name="loadMore"><u>Load more</u></string>
 </resources>
