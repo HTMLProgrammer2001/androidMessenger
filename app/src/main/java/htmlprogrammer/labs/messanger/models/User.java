@@ -2,6 +2,9 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class User {
     private String id;
     private String avatar;
@@ -9,6 +12,9 @@ public class User {
     private String phone = "";
     private String nick = "";
     private String description = "";
+    private boolean isBanned = false;
+    private boolean isOnline = false;
+    private Date lastSeen = new Date();
 
     public String getDescription() {
         return description;
@@ -64,6 +70,47 @@ public class User {
         this.id = id;
     }
 
+    public boolean isBanned() {
+        return isBanned;
+    }
+
+    public void setBanned(boolean banned) {
+        isBanned = banned;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
+    }
+
+    public Date getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(Date lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
+    public void parseLastSeen(String date){
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            lastSeen = format.parse(date);
+        }
+        catch (Exception e){ }
+    }
+
+    public String getDateString(){
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+        if(lastSeen != null)
+            return outputFormat.format(lastSeen);
+
+        return "";
+    }
+
     public static User fromJSON(JSONObject obj){
          User user = new User();
 
@@ -72,8 +119,11 @@ public class User {
              user.setFullName(obj.getString("name"));
              user.setNick(obj.getString("nickname"));
              user.setPhone(obj.getString("phone"));
-             user.setAvatar(obj.getString("avatar"));
-             user.setDescription(obj.getString("description"));
+             user.setBanned(obj.getBoolean("isBanned"));
+             user.setOnline(obj.getBoolean("isOnline"));
+             user.setAvatar(obj.optString("avatar", ""));
+             user.setDescription(obj.optString("description", ""));
+             user.parseLastSeen(obj.getString("lastSeen"));
          }
          catch (Exception e){}
 

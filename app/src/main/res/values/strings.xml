@@ -67,4 +67,7 @@
     <string name="loadMore"><u>Load more</u></string>
 
     <string name="participants">%1$d participants</string>
+    <string name="banned">You leaved or was banned</string>
+    <string name="lastSeen">Last seen at %1$s</string>
+    <string name="startDialog">Start dialog</string>
 </resources>

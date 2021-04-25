@@ -26,6 +26,7 @@
         android:layout_marginTop="8dp"
         android:text="TextView"
         android:textColor="@color/textBlack"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

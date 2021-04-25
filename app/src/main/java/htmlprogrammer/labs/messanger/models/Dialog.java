@@ -13,6 +13,8 @@ public class Dialog implements Comparable<Dialog> {
     private int unread = 0;
     private int partCount;
     private DialogTypes type;
+    private boolean isActive = true;
+    private String user;
 
     @Override
     public int compareTo(Dialog otherDialog) {
@@ -63,12 +65,14 @@ public class Dialog implements Comparable<Dialog> {
             dialog.setPartCount(obj.getInt("partCount"));
             dialog.setType(DialogTypes.fromInt(obj.getInt("type")));
             dialog.setAvatar(obj.optString("avatar", null));
+            dialog.setActive(obj.getBoolean("isActive"));
 
             if (obj.optJSONObject("lastMessage") != null && withMessage) {
                 dialog.setMessage(Message.fromJSON(obj.getJSONObject("lastMessage")));
             }
-        } catch (Exception e) {
-        }
+
+            dialog.setUser(obj.getString("user"));
+        } catch (Exception e) {}
 
         return dialog;
     }
@@ -135,5 +139,21 @@ public class Dialog implements Comparable<Dialog> {
 
     public void setPartCount(int partCount) {
         this.partCount = partCount;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

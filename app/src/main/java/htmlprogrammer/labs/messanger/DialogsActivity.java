@@ -142,10 +142,9 @@ public class DialogsActivity extends BaseActivity{
         return true;
     }
 
-    public void openDialog(String nick, ChatTypes chatTypes){
+    public void openDialog(String nick){
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("nick", nick);
-        intent.putExtra("type", chatTypes);
 
         startActivity(intent);
     }

@@ -99,7 +99,7 @@ public class UserFragment extends Fragment {
             }
         });
 
-        userName.setOnClickListener(v -> activity.openDialog(user.getNick(), ChatTypes.USER));
-        root.setOnClickListener(v -> activity.openDialog(user.getNick(), ChatTypes.USER));
+        userName.setOnClickListener(v -> activity.openDialog(user.getNick()));
+        root.setOnClickListener(v -> activity.openDialog(user.getNick()));
     }
 }

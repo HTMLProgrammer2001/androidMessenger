@@ -2,6 +2,7 @@ package htmlprogrammer.labs.messanger;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -13,7 +14,11 @@ import org.json.JSONObject;
 import htmlprogrammer.labs.messanger.api.SearchAPI;
 import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.constants.DialogTypes;
+import htmlprogrammer.labs.messanger.fragments.Loader;
 import htmlprogrammer.labs.messanger.fragments.UserAvatar;
+import htmlprogrammer.labs.messanger.fragments.chatFragments.BannedFragment;
+import htmlprogrammer.labs.messanger.fragments.chatFragments.DialogFragment;
+import htmlprogrammer.labs.messanger.fragments.chatFragments.NoDialogFragment;
 import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeStore;
@@ -25,6 +30,7 @@ public class ChatActivity extends AppCompatActivity {
     private UserAvatar avatar;
     private ChatViewModel chatVM;
     private ChatStore chatStore = ChatStore.getInstance();
+    private String nick;
 
     private TextView name;
     private TextView info;
@@ -41,7 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar));
 
         //init avatars
-        avatar = UserAvatar.getInstance("Test", "");
+        avatar = UserAvatar.getInstance("", "");
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.avatar, avatar, null).commit();
 
@@ -51,13 +57,8 @@ public class ChatActivity extends AppCompatActivity {
         back = findViewById(R.id.back);
 
         //start loading
-        String nick = getIntent().getStringExtra("nick");
-        ChatTypes type = (ChatTypes) getIntent().getSerializableExtra("type");
-
-        if(type.equals(ChatTypes.USER))
-            startUserLoading(nick);
-        else
-            startDialogLoading(nick);
+        nick = getIntent().getStringExtra("nick");
+        startUserLoading();
 
         addHandlers();
     }
@@ -72,21 +73,36 @@ public class ChatActivity extends AppCompatActivity {
         back.setOnClickListener(v -> finish());
 
         chatVM.getDialogData().observe(this, dialog -> {
-            if(dialog == null)
+            if(dialog == null) {
+                replaceFragment(new NoDialogFragment());
                 return;
+            }
 
-            String info = getString(R.string.participants, dialog.getPartCount());
-            if(dialog.getType().equals(DialogTypes.PERSONAL))
-                info = "Online";
+            if(dialog.getType().equals(DialogTypes.CHAT))
+                initUI(dialog.getName(), dialog.getAvatar(), getString(R.string.participants, dialog.getPartCount()));
 
-            initUI(dialog.getName(), dialog.getAvatar(), info);
+            if(!dialog.isActive())
+                replaceFragment(new BannedFragment());
+            else
+                replaceFragment(new DialogFragment());
         });
 
         chatVM.getUserData().observe(this, user -> {
             if(user == null)
                 return;
 
-            initUI(user.getFullName(), user.getAvatar(), "Online");
+            //update ui
+            String info = user.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, user.getDateString());
+            initUI(user.getFullName(), user.getAvatar(), info);
+
+            if(user.isBanned())
+                replaceFragment(new BannedFragment());
+        });
+
+        chatVM.getLoadingData().observe(this, isLoading -> {
+            //show loader
+            if(isLoading)
+                replaceFragment(new Loader());
         });
     }
 
@@ -96,14 +112,9 @@ public class ChatActivity extends AppCompatActivity {
         this.info.setText(info);
     }
 
-    private void startUserLoading(String userNick){
+    private void startUserLoading(){
         chatStore.startLoading();
-
-        SearchAPI.getUserByNickname(
-                MeStore.getInstance().getToken(),
-                userNick,
-                this::onUserLoaded
-        );
+        SearchAPI.getUserByNickname(MeStore.getInstance().getToken(), nick, this::onUserLoaded);
     }
 
     private void onUserLoaded(Exception e, Response response){
@@ -111,11 +122,12 @@ public class ChatActivity extends AppCompatActivity {
         chatStore.stopLoading();
 
         if(e != null || !response.isSuccessful()){
-            //get error
-            String errorText = e != null ? e.getMessage() : "";
-            errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
-
-            Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> {
+                //get error
+                String errorText = e != null ? e.getMessage() : "";
+                errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+                Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show();
+            });
         }
         else{
             try {
@@ -123,22 +135,23 @@ public class ChatActivity extends AppCompatActivity {
                 JSONObject object = new JSONObject(response.body().string());
                 User newUser = User.fromJSON(object.getJSONObject("user"));
 
+                //update ui
+                String info = newUser.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, newUser.getDateString());
+                runOnUiThread(() -> initUI(newUser.getFullName(), newUser.getAvatar(), info));
+
                 //add it to state
                 chatStore.setUser(newUser);
             } catch (Exception err) {
                 err.printStackTrace();
             }
         }
+
+        startDialogLoading();
     }
 
-    private void startDialogLoading(String dialogNick){
+    private void startDialogLoading(){
         chatStore.startLoading();
-
-        SearchAPI.getDialogByNickname(
-                MeStore.getInstance().getToken(),
-                dialogNick,
-                this::onDialogLoaded
-        );
+        SearchAPI.getDialogByNickname(MeStore.getInstance().getToken(), nick, this::onDialogLoaded);
     }
 
     private void onDialogLoaded(Exception e, Response response){
@@ -146,11 +159,14 @@ public class ChatActivity extends AppCompatActivity {
         chatStore.stopLoading();
 
         if(e != null || !response.isSuccessful()){
-            //get error
-            String errorText = e != null ? e.getMessage() : "";
-            errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+            chatStore.setDialog(null);
 
-            Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show();
+            runOnUiThread(() -> {
+                //get error
+                String errorText = e != null ? e.getMessage() : "";
+                errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+                Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show();
+            });
         }
         else{
             try {
@@ -164,5 +180,11 @@ public class ChatActivity extends AppCompatActivity {
                 err.printStackTrace();
             }
         }
+    }
+
+    private void replaceFragment(Fragment fragment){
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content, fragment, null)
+                .commit();
     }
 }
