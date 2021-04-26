@@ -1,7 +1,9 @@
 package htmlprogrammer.labs.messanger;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -12,7 +14,6 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import htmlprogrammer.labs.messanger.api.SearchAPI;
-import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.constants.DialogTypes;
 import htmlprogrammer.labs.messanger.fragments.Loader;
 import htmlprogrammer.labs.messanger.fragments.UserAvatar;
@@ -35,6 +36,7 @@ public class ChatActivity extends AppCompatActivity {
     private TextView name;
     private TextView info;
     private ImageView back;
+    private ConstraintLayout data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class ChatActivity extends AppCompatActivity {
         name = findViewById(R.id.name);
         info = findViewById(R.id.info);
         back = findViewById(R.id.back);
+        data = findViewById(R.id.data);
 
         //start loading
         nick = getIntent().getStringExtra("nick");
@@ -70,6 +73,23 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void addHandlers(){
+        data.setOnClickListener(v -> {
+            if(chatStore.getUser() != null) {
+                //show user info
+                Intent userIntent = new Intent(this, UserInfoActivity.class);
+                userIntent.putExtra("userID", chatStore.getUser().getId());
+
+                startActivity(userIntent);
+            }
+            else if(chatStore.getDialog() != null){
+                //show dialog info
+                Intent groupIntent = new Intent(this, GroupInfoActivity.class);
+                groupIntent.putExtra("groupID", chatStore.getDialog().getId());
+
+                startActivity(groupIntent);
+            }
+        });
+
         back.setOnClickListener(v -> finish());
 
         chatVM.getDialogData().observe(this, dialog -> {
@@ -94,9 +114,6 @@ public class ChatActivity extends AppCompatActivity {
             //update ui
             String info = user.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, user.getDateString());
             initUI(user.getFullName(), user.getAvatar(), info);
-
-            if(user.isBanned())
-                replaceFragment(new BannedFragment());
         });
 
         chatVM.getLoadingData().observe(this, isLoading -> {
@@ -113,6 +130,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void startUserLoading(){
+        chatStore.reset();
         chatStore.startLoading();
         SearchAPI.getUserByNickname(MeStore.getInstance().getToken(), nick, this::onUserLoaded);
     }
@@ -134,10 +152,6 @@ public class ChatActivity extends AppCompatActivity {
                 //parse new dialogs
                 JSONObject object = new JSONObject(response.body().string());
                 User newUser = User.fromJSON(object.getJSONObject("user"));
-
-                //update ui
-                String info = newUser.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, newUser.getDateString());
-                runOnUiThread(() -> initUI(newUser.getFullName(), newUser.getAvatar(), info));
 
                 //add it to state
                 chatStore.setUser(newUser);

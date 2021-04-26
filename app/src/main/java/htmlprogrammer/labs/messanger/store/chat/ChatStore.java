@@ -55,10 +55,14 @@ public class ChatStore {
         isLoading.addObserver(observer);
     }
 
-    public void startLoading() {
-        isLoading.notifyObservers(true);
+    public void reset(){
         dialog.notifyObservers(null);
         user.notifyObservers(null);
+        isLoading.notifyObservers(false);
+    }
+
+    public void startLoading() {
+        isLoading.notifyObservers(true);
     }
 
     public void stopLoading(){

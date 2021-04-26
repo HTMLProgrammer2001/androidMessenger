@@ -70,4 +70,7 @@
     <string name="banned">You leaved or was banned</string>
     <string name="lastSeen">Last seen at %1$s</string>
     <string name="startDialog">Start dialog</string>
+    <string name="actions">Actions</string>
+    <string name="ban">Ban</string>
+    <string name="clear">Clear</string>
 </resources>

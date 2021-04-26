@@ -15,7 +15,13 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChatActivity" android:theme="@style/WithoutActionBar"/>
+        <activity android:name=".GroupInfoActivity"></activity>
+        <activity
+            android:name=".UserInfoActivity"
+            android:theme="@style/WithoutActionBar" />
+        <activity
+            android:name=".ChatActivity"
+            android:theme="@style/WithoutActionBar" />
         <activity android:name=".DialogsActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ChangePhoneActivity" />
