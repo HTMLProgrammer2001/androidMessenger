@@ -42,4 +42,21 @@ public class ChatAPI extends ApiClass {
         }
         catch (Exception e){ }
     }
+
+    public static void createPersonal(String token, String userID, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try{
+            data.put("to", userID);
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/dialogs/personal")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .post(body)
+                    .build();
+
+            makeCall(request, callback);
+        }
+        catch (Exception e){ }
+    }
 }

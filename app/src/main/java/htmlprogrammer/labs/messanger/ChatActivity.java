@@ -94,7 +94,11 @@ public class ChatActivity extends AppCompatActivity {
 
         chatVM.getDialogData().observe(this, dialog -> {
             if(dialog == null) {
-                replaceFragment(new NoDialogFragment());
+                User user = chatStore.getUser();
+
+                if(user != null)
+                    replaceFragment(NoDialogFragment.getInstance(user.getId(), user.getNick()));
+
                 return;
             }
 

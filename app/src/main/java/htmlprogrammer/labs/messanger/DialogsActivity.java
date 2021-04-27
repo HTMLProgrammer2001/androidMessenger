@@ -232,7 +232,7 @@ public class DialogsActivity extends BaseActivity{
         SearchTypes type = searchVM.getSearchType().getValue();
 
         //get dialogs
-        if(type != null && type.equals(SearchTypes.NICK)){
+        if(type != null && type.equals(SearchTypes.NICK) && !searchStore.getSearchText().isEmpty()){
             SearchAPI.getDialogsByNick(MeStore.getInstance().getToken(),
                     searchStore.getSearchText().substring(1),
                     searchDialogsStore.getCurPage() + 1,
