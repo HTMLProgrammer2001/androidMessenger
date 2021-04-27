@@ -77,14 +77,14 @@ public class ChatActivity extends AppCompatActivity {
             if(chatStore.getUser() != null) {
                 //show user info
                 Intent userIntent = new Intent(this, UserInfoActivity.class);
-                userIntent.putExtra("userID", chatStore.getUser().getId());
+                userIntent.putExtra("userNick", chatStore.getUser().getNick());
 
                 startActivity(userIntent);
             }
             else if(chatStore.getDialog() != null){
                 //show dialog info
                 Intent groupIntent = new Intent(this, GroupInfoActivity.class);
-                groupIntent.putExtra("groupID", chatStore.getDialog().getId());
+                groupIntent.putExtra("groupNick", chatStore.getDialog().getNick());
 
                 startActivity(groupIntent);
             }
