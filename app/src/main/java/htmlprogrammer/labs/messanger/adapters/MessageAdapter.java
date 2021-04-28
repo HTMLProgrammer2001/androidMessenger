@@ -12,7 +12,6 @@ import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.DialogsActivity;
 import htmlprogrammer.labs.messanger.R;
-import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.models.Message;
 
 public class MessageAdapter extends RecyclerView.Adapter<SearchViewHolder> {

@@ -2,7 +2,6 @@ package htmlprogrammer.labs.messanger.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.DialogsActivity;
 import htmlprogrammer.labs.messanger.R;
-import htmlprogrammer.labs.messanger.constants.ChatTypes;
 import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.Message;
 

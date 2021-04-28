@@ -10,6 +10,7 @@ import htmlprogrammer.labs.messanger.BuildConfig;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.interfaces.APICallback;
 import htmlprogrammer.labs.messanger.interfaces.ApiClass;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
@@ -56,6 +57,19 @@ public class MessageAPI extends ApiClass {
                 .addHeader("Authorization", "Bearer " + token)
                 .post(body)
                 .build();
+
+        makeCall(request, callback);
+    }
+
+    public static void getMessages(String token, String dialog, int page, int pageSize, APICallback callback){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BuildConfig.API_URL + "/messages/chat/" + dialog).newBuilder();
+        urlBuilder.addQueryParameter("pageSize", Integer.toString(pageSize));
+        urlBuilder.addQueryParameter("page", Integer.toString(page));
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build().toString())
+                .addHeader("Authorization", "Bearer " + token)
+                .get().build();
 
         makeCall(request, callback);
     }
