@@ -78,6 +78,10 @@ public class DialogsActivity extends BaseActivity{
         meVM = ViewModelProviders.of(this).get(MeViewModel.class);
         searchVM = ViewModelProviders.of(this).get(SearchViewModel.class);
 
+        searchDialogsStore.reset();
+        searchMessagesStore.reset();
+        searchUserStore.reset();
+
         subscribe();
         startDialogsLoading();
     }

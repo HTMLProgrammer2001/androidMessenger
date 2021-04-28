@@ -4,13 +4,10 @@ import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -29,6 +26,7 @@ import htmlprogrammer.labs.messanger.dialogs.LanguageDialog;
 import htmlprogrammer.labs.messanger.dialogs.NameChangeDialog;
 import htmlprogrammer.labs.messanger.dialogs.NickChangeDialog;
 import htmlprogrammer.labs.messanger.fragments.UserAvatar;
+import htmlprogrammer.labs.messanger.helpers.FileHelper;
 import htmlprogrammer.labs.messanger.interfaces.BaseActivity;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeStore;
@@ -117,7 +115,7 @@ public class SettingsActivity extends BaseActivity {
             try {
                 //get file
                 Uri uri = data.getData();
-                String filePath = getRealPathFromUri(this, uri);
+                String filePath = FileHelper.getRealPathFromUri(this, uri);
                 File file = new File(filePath);
 
                 //save on server
@@ -127,14 +125,6 @@ public class SettingsActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    private static String getRealPathFromUri(Activity activity, Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = activity.managedQuery(contentUri, proj, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
     }
 
     private void addHandlers(){

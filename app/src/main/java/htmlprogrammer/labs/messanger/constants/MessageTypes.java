@@ -1,11 +1,16 @@
 package htmlprogrammer.labs.messanger.constants;
 
 public enum MessageTypes {
-    TEXT(0);
+    TEXT(0),
+    IMAGE(1),
+    VIDEO(2),
+    DOCUMENT(3),
+    AUDIO(4);
+
 
     private int value;
 
-    private MessageTypes(int val){
+    MessageTypes(int val){
         value = val;
     }
 
