@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.ImageMessageViewHolder;
+import htmlprogrammer.labs.messanger.adapters.messagesVH.SpecialMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.TextMessageViewHolder;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.interfaces.MessageViewHolder;
@@ -43,6 +43,8 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             //show messages by type
             if(message.getType().equals(MessageTypes.IMAGE))
                 holder = new ImageMessageViewHolder(inflater.inflate(R.layout.image_message_layout, viewGroup, false));
+            else if(message.getType().equals(MessageTypes.SPECIAL))
+                holder = new SpecialMessageViewHolder(inflater.inflate(R.layout.special_message_layout, viewGroup, false));
             else
                 holder = new TextMessageViewHolder(inflater.inflate(R.layout.text_message_layout, viewGroup, false));
         }

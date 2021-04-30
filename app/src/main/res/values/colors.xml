@@ -9,6 +9,7 @@
     <color name="bgGreen">#0f0</color>
     <color name="bgWhite">#fff</color>
     <color name="bgMessage">#BADBFA</color>
+    <color name="bgBlack">#80000000</color>
 
     <color name="textWhite">#fff</color>
     <color name="textError">#f00</color>

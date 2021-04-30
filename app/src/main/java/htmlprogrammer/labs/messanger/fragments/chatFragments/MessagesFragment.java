@@ -73,6 +73,15 @@ public class MessagesFragment extends Fragment {
             if(err != null)
                 Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show();
         });
+
+        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if(!chatMessagesStore.getLoading() && recyclerView.computeVerticalScrollOffset() < 200
+                        && chatMessagesStore.hasMore())
+                    startLoading();
+            }
+        });
     }
 
     private void startLoading(){
@@ -81,7 +90,7 @@ public class MessagesFragment extends Fragment {
         MessageAPI.getMessages(
                 MeStore.getInstance().getToken(),
                 ChatStore.getInstance().getDialog().getId(),
-                chatMessagesStore.getCurPage(),
+                chatMessagesStore.getCurPage() + 1,
                 chatMessagesStore.getPageSize(),
                 this::onMessagesLoaded
         );
