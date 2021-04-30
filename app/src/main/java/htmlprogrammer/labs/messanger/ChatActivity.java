@@ -116,7 +116,7 @@ public class ChatActivity extends AppCompatActivity {
                 return;
 
             //update ui
-            String info = user.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, user.getDateString());
+            String info = user.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, user.getDateTimeString());
             initUI(user.getFullName(), user.getAvatar(), info);
         });
 

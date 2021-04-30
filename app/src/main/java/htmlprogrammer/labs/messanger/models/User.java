@@ -2,8 +2,9 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import htmlprogrammer.labs.messanger.helpers.DateHelper;
 
 public class User {
     private String id;
@@ -95,20 +96,11 @@ public class User {
     }
 
     public void parseLastSeen(String date){
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            lastSeen = format.parse(date);
-        }
-        catch (Exception e){ }
+        lastSeen = DateHelper.parseDate(date);
     }
 
-    public String getDateString(){
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-
-        if(lastSeen != null)
-            return outputFormat.format(lastSeen);
-
-        return "";
+    public String getDateTimeString(){
+        return DateHelper.toDateTimeStr(lastSeen);
     }
 
     public static User fromJSON(JSONObject obj){

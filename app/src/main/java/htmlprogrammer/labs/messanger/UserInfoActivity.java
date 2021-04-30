@@ -111,7 +111,7 @@ public class UserInfoActivity extends AppCompatActivity {
                 return;
 
             String descriptionStr = user.getDescription();
-            String lastSeenStr = user.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, user.getDateString());
+            String lastSeenStr = user.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, user.getDateTimeString());
 
             if(descriptionStr == null || descriptionStr.isEmpty())
                 descriptionStr = getString(R.string.notSet);

@@ -52,11 +52,14 @@ public class MessagesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         chatMessagesVM = ViewModelProviders.of(this).get(ChatMessagesViewModel.class);
         list = view.findViewById(R.id.list);
-        adapter = new ChatAdapter(requireContext());
+        adapter = new ChatAdapter(getFragmentManager());
 
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(requireContext());
-        list.setAdapter(adapter);
+        LinearLayoutManager manager = new LinearLayoutManager(requireContext());
+        manager.setReverseLayout(true);
+        manager.setStackFromEnd(false);
+
         list.setLayoutManager(manager);
+        list.setAdapter(adapter);
 
         chatMessagesStore.reset();
         addHandlers();

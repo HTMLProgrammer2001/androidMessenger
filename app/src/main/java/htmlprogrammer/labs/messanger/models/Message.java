@@ -6,14 +6,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
+import htmlprogrammer.labs.messanger.helpers.DateHelper;
 
 public class Message implements Comparable<Message> {
     private String id;
     private String message;
     private MessageTypes type;
     private Date time;
-    private Dialog dialog;
     private boolean readed;
+    private Dialog dialog;
+    private User author;
     private int size = 0;
     private String url = null;
 
@@ -42,22 +44,16 @@ public class Message implements Comparable<Message> {
 
     public static Message fromJSON(JSONObject obj){
         Message message = new Message();
-        Date time = null;
-
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            time = format.parse(obj.getString("time"));
-        }
-        catch (Exception e){ }
 
         try{
             message.setId(obj.getString("_id"));
             message.setMessage(obj.getString("message"));
-            message.setTime(time);
             message.setType(MessageTypes.fromInt(obj.getInt("type")));
+            message.setTime(DateHelper.parseDate(obj.getString("time")));
             message.setReaded(obj.optBoolean("readed", false));
             message.setSize(obj.optInt("size", 0));
             message.setUrl(obj.optString("url", null));
+            message.setAuthor(User.fromJSON(obj.getJSONObject("author")));
 
             if(obj.optJSONObject("dialog") != null)
                 message.setDialog(Dialog.fromJSON(obj.optJSONObject("dialog"), false));
@@ -65,6 +61,14 @@ public class Message implements Comparable<Message> {
         catch (Exception e){}
 
         return message;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public String getId() {
@@ -95,13 +99,16 @@ public class Message implements Comparable<Message> {
         return time;
     }
 
+    public String getDateTimeString(){
+        return DateHelper.toDateTimeStr(time);
+    }
+
     public String getTimeString(){
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        return DateHelper.toTimeStr(time);
+    }
 
-        if(time != null)
-            return outputFormat.format(time);
-
-        return "";
+    public String getDateString(){
+        return DateHelper.toDateStr(time);
     }
 
     public void setTime(Date time) {

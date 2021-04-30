@@ -30,6 +30,7 @@
             android:id="@+id/start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/bgWhite"
             android:padding="20dp"
             android:text="@string/startDialog"
             android:textAlignment="center"

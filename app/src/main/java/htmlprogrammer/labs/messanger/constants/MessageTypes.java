@@ -5,7 +5,8 @@ public enum MessageTypes {
     IMAGE(1),
     VIDEO(2),
     DOCUMENT(3),
-    AUDIO(4);
+    AUDIO(4),
+    SPECIAL(5);
 
 
     private int value;

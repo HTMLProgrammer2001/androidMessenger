@@ -51,6 +51,7 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder dialogViewHolder, int i) {
         if(data.size() > 0 && data.size() != i){
+            //update ui
             Dialog dialog = data.get(i);
             dialogViewHolder.showName(dialog.getName());
             dialogViewHolder.showAvatar(dialog.getName(), dialog.getAvatar());
@@ -59,10 +60,12 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
             Message message = dialog.getMessage();
 
             if(message != null){
-                dialogViewHolder.showTime(message.getTimeString());
+                //show last message info
+                dialogViewHolder.showTime(message.getDateTimeString());
                 dialogViewHolder.showMessage(message.getMessage());
             }
             else{
+                //show default data if message not exists
                 dialogViewHolder.showTime("");
                 dialogViewHolder.showMessage(ctx.getString(R.string.messagesDeleted));
             }
@@ -78,8 +81,7 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
     @Override
     public long getItemId(int position) {
-        Dialog dialog = data.get(position);
-        return dialog.getId().hashCode();
+        return data.get(position).getId().hashCode();
     }
 
     public void setData(TreeSet<Dialog> data){

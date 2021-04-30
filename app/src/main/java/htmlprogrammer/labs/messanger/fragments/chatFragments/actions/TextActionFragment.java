@@ -137,6 +137,8 @@ public class TextActionFragment extends Fragment {
                     message,
                     this::onSent
             );
+
+            input.setText("");
         });
 
         input.addTextChangedListener(new TextWatcher() {
@@ -172,6 +174,9 @@ public class TextActionFragment extends Fragment {
     }
 
     private void onSent(Exception err, Response response){
+        if(getActivity() == null)
+            return;
+
         requireActivity().runOnUiThread(() -> {
             try {
                 Toast.makeText(requireContext(), response.body().string(), Toast.LENGTH_SHORT).show();

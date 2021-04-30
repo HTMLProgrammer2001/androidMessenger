@@ -1,60 +1,78 @@
 package htmlprogrammer.labs.messanger.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import htmlprogrammer.labs.messanger.R;
-import htmlprogrammer.labs.messanger.models.Message;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeSet;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
+import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.adapters.messagesVH.ImageMessageViewHolder;
+import htmlprogrammer.labs.messanger.adapters.messagesVH.TextMessageViewHolder;
+import htmlprogrammer.labs.messanger.constants.MessageTypes;
+import htmlprogrammer.labs.messanger.interfaces.MessageViewHolder;
+import htmlprogrammer.labs.messanger.models.Message;
+
+public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     private ArrayList<Message> data = new ArrayList<>();
-    private LayoutInflater inflater;
+    private FragmentManager manager;
 
-    private final int LIST_TYPE = 1;
-    private final int EMPTY_TYPE = 2;
+    private final int EMPTY_TYPE = -1;
 
-    public ChatAdapter(Context ctx){
-        inflater = LayoutInflater.from(ctx);
+    public ChatAdapter(FragmentManager manager){
+        this.manager = manager;
     }
 
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view;
+        MessageViewHolder holder;
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
 
         if(data.size() == 0)
-            view = inflater.inflate(R.layout.empty_adapter, viewGroup, false);
-        else
-            view = inflater.inflate(R.layout.message_layout, viewGroup, false);
+            //show no messages label
+            holder = new TextMessageViewHolder(inflater.inflate(R.layout.empty_adapter, viewGroup, false));
+        else{
+            Message message = data.get(i);
 
-        return new MessageViewHolder(view);
+            //show messages by type
+            if(message.getType().equals(MessageTypes.IMAGE))
+                holder = new ImageMessageViewHolder(inflater.inflate(R.layout.image_message_layout, viewGroup, false));
+            else
+                holder = new TextMessageViewHolder(inflater.inflate(R.layout.text_message_layout, viewGroup, false));
+        }
+
+        return holder;
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return data.size() == 0 ? EMPTY_TYPE : LIST_TYPE;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull MessageViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull MessageViewHolder textMessageViewHolder, int i) {
         if(data.size() == 0)
             return;
 
         Message message = data.get(i);
-        viewHolder.setMessage(message.getMessage());
+        textMessageViewHolder.updateUI(message, manager);
+        textMessageViewHolder.setIsRecyclable(false);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return data.size() == 0 ? EMPTY_TYPE : position;
     }
 
     @Override
     public int getItemCount() {
         return Math.max(data.size(), 1);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return data.get(position).getId().hashCode();
     }
 
     public void setData(TreeSet<Message> data){
@@ -65,21 +83,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
             messages.add((Message) dialog);
         }
 
+        Collections.reverse(messages);
         this.data = messages;
         this.notifyDataSetChanged();
-    }
-
-    class MessageViewHolder extends RecyclerView.ViewHolder{
-        private TextView message;
-
-        MessageViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            message = itemView.findViewById(R.id.message);
-        }
-
-        void setMessage(String msg){
-            message.setText(msg);
-        }
     }
 }
