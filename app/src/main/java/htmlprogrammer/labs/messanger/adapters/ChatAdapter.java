@@ -66,6 +66,20 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         Message message = data.get(i);
         textMessageViewHolder.updateUI(message, manager);
         textMessageViewHolder.setIsRecyclable(false);
+
+        //show date if needed
+        if(i == 0) {
+            textMessageViewHolder.setDate(data.get(i).getDateString());
+            return;
+        }
+
+        String prevDate = data.get(i - 1).getDateString();
+        String curDate = data.get(i).getDateString();
+
+        if(prevDate.equals(curDate))
+            textMessageViewHolder.hideDate();
+        else
+            textMessageViewHolder.setDate(curDate);
     }
 
     @Override
@@ -76,11 +90,6 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     @Override
     public int getItemCount() {
         return Math.max(data.size(), 1);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return data.get(position).getId().hashCode();
     }
 
     public void setData(TreeSet<Message> data){

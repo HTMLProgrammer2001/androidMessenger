@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +34,7 @@ import okhttp3.Response;
  */
 public class MessagesFragment extends Fragment {
     private RecyclerView list;
+    private FloatingActionButton fab;
     private ChatAdapter adapter;
 
     private ChatMessagesViewModel chatMessagesVM;
@@ -52,6 +54,7 @@ public class MessagesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         chatMessagesVM = ViewModelProviders.of(this).get(ChatMessagesViewModel.class);
         list = view.findViewById(R.id.list);
+        fab = view.findViewById(R.id.fab);
         adapter = new ChatAdapter(getFragmentManager());
 
         LinearLayoutManager manager = new LinearLayoutManager(requireContext());
@@ -77,11 +80,20 @@ public class MessagesFragment extends Fragment {
         list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if(!chatMessagesStore.getLoading() && recyclerView.computeVerticalScrollOffset() < 200
+                int offset = recyclerView.computeVerticalScrollOffset();
+
+                //load new messages
+                if(!chatMessagesStore.getLoading() && offset < 200
                         && chatMessagesStore.hasMore())
                     startLoading();
+
+                //toggle fab
+                boolean isVisible = recyclerView.computeVerticalScrollRange() - offset - recyclerView.computeVerticalScrollExtent() > 300;
+                fab.setVisibility(isVisible ? View.VISIBLE : View.GONE);
             }
         });
+
+        fab.setOnClickListener(v -> list.scrollToPosition(0));
     }
 
     private void startLoading(){
