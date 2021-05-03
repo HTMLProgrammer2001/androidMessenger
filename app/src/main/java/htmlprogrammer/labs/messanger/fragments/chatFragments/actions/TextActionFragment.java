@@ -21,15 +21,18 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.File;
-import java.io.IOException;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.MessageAPI;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.helpers.FileHelper;
 import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
+import htmlprogrammer.labs.messanger.models.Message;
 import okhttp3.Response;
 
 /**
@@ -173,16 +176,32 @@ public class TextActionFragment extends Fragment {
         startActivityForResult(intent, FILE_REQUEST_CODE);
     }
 
-    private void onSent(Exception err, Response response){
+    private void onSent(Exception e, Response response){
         if(getActivity() == null)
             return;
 
-        requireActivity().runOnUiThread(() -> {
+        //stop loading
+        chatStore.stopLoading();
+
+        if(e != null || !response.isSuccessful()){
+            requireActivity().runOnUiThread(() -> {
+                //get error
+                String errorText = e != null ? e.getMessage() : "";
+                errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
+                Toast.makeText(requireActivity(), errorText, Toast.LENGTH_SHORT).show();
+            });
+        }
+        else{
             try {
-                Toast.makeText(requireContext(), response.body().string(), Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
+                //parse new message
+                JSONObject object = new JSONObject(response.body().string());
+                Message newMessage = Message.fromJSON(object.getJSONObject("newMessage"));
+
+                //add it to state
+                ChatMessagesStore.getInstance().addMessage(newMessage);
+            } catch (Exception err) {
+                err.printStackTrace();
             }
-        });
+        }
     }
 }

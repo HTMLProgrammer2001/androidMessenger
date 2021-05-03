@@ -11,9 +11,11 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.adapters.messagesVH.AudioMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.ImageMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.SpecialMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.TextMessageViewHolder;
+import htmlprogrammer.labs.messanger.adapters.messagesVH.VideoMessageViewHolder;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.interfaces.MessageViewHolder;
 import htmlprogrammer.labs.messanger.models.Message;
@@ -43,6 +45,10 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             //show messages by type
             if(message.getType().equals(MessageTypes.IMAGE))
                 holder = new ImageMessageViewHolder(inflater.inflate(R.layout.image_message_layout, viewGroup, false));
+            else if(message.getType().equals(MessageTypes.VIDEO))
+                holder = new VideoMessageViewHolder(inflater.inflate(R.layout.video_message_layout, viewGroup, false));
+            else if(message.getType().equals(MessageTypes.AUDIO))
+                holder = new AudioMessageViewHolder(inflater.inflate(R.layout.audio_message_layout, viewGroup, false));
             else if(message.getType().equals(MessageTypes.SPECIAL))
                 holder = new SpecialMessageViewHolder(inflater.inflate(R.layout.special_message_layout, viewGroup, false));
             else

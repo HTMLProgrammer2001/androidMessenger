@@ -1,7 +1,6 @@
 package htmlprogrammer.labs.messanger.adapters.messagesVH;
 
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,7 +19,6 @@ public class ImageMessageViewHolder extends MessageViewHolder {
     private ImageView img;
     private TextView time;
     private ImageView check2;
-    private ConstraintLayout group;
 
     public ImageMessageViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -30,7 +28,6 @@ public class ImageMessageViewHolder extends MessageViewHolder {
         name = itemView.findViewById(R.id.name);
         time = itemView.findViewById(R.id.time);
         check2 = itemView.findViewById(R.id.check2);
-        group = itemView.findViewById(R.id.group);
     }
 
     public void updateUI(Message message, FragmentManager manager){
@@ -41,12 +38,6 @@ public class ImageMessageViewHolder extends MessageViewHolder {
         setTime(message.getTimeString());
 
         img.setOnClickListener(v -> ImageDialog.getInstance(message.getUrl()).show(manager, "Image"));
-    }
-
-    void setOwn(boolean isOwn){
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) group.getLayoutParams();
-        params.horizontalBias = isOwn ? 1 : 0;
-        group.setLayoutParams(params);
     }
 
     void setImage(String url) {
