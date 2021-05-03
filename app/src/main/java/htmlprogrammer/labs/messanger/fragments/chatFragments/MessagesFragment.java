@@ -55,7 +55,7 @@ public class MessagesFragment extends Fragment {
         chatMessagesVM = ViewModelProviders.of(this).get(ChatMessagesViewModel.class);
         list = view.findViewById(R.id.list);
         fab = view.findViewById(R.id.fab);
-        adapter = new ChatAdapter(getFragmentManager());
+        adapter = new ChatAdapter(getFragmentManager(), requireActivity());
 
         LinearLayoutManager manager = new LinearLayoutManager(requireContext());
         manager.setReverseLayout(true);

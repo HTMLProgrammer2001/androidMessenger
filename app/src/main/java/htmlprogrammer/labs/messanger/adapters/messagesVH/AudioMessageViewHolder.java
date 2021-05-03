@@ -44,8 +44,8 @@ public class AudioMessageViewHolder extends MessageViewHolder {
         check2 = itemView.findViewById(R.id.check2);
         action = itemView.findViewById(R.id.action);
         actionImg = itemView.findViewById(R.id.actionImg);
-        audioName = itemView.findViewById(R.id.audioName);
-        duration = itemView.findViewById(R.id.size);
+        audioName = itemView.findViewById(R.id.documentName);
+        duration = itemView.findViewById(R.id.duration);
         total = itemView.findViewById(R.id.total);
         passed = itemView.findViewById(R.id.passed);
     }

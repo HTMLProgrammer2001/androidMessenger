@@ -33,7 +33,7 @@ public class VideoMessageViewHolder extends MessageViewHolder {
         name = itemView.findViewById(R.id.name);
         time = itemView.findViewById(R.id.time);
         check2 = itemView.findViewById(R.id.check2);
-        size = itemView.findViewById(R.id.size);
+        size = itemView.findViewById(R.id.passed);
         play = itemView.findViewById(R.id.play);
     }
 
