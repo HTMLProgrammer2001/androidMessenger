@@ -10,7 +10,6 @@ import htmlprogrammer.labs.messanger.BuildConfig;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.interfaces.APICallback;
 import htmlprogrammer.labs.messanger.interfaces.ApiClass;
-import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -73,30 +72,5 @@ public class MessageAPI extends ApiClass {
                 .get().build();
 
         makeCall(request, callback);
-    }
-
-    public static void downloadFile(String url, String name, APICallback callback){
-        Request request = new Request.Builder()
-                .url(url)
-                .tag("download:" + name)
-                .get().build();
-
-        makeCall(request, callback);
-    }
-
-    public static void cancelDownloading(String name){
-        for(Call call : client.dispatcher().runningCalls()){
-            if(call.request().tag().equals("download:" + name))
-                call.cancel();
-        }
-    }
-
-    public static boolean hasDownloading(String name){
-        for(Call call : client.dispatcher().runningCalls()){
-            if(call.request().tag().equals("download:" + name))
-                return true;
-        }
-
-        return false;
     }
 }

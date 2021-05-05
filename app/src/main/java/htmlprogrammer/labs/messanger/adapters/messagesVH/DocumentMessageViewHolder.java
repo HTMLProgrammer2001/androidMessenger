@@ -1,6 +1,10 @@
 package htmlprogrammer.labs.messanger.adapters.messagesVH;
 
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -33,7 +37,6 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
 
     private String url;
     private String fileName;
-    private boolean isDownloading = false;
     private Activity activity;
 
     public DocumentMessageViewHolder(@NonNull View itemView, Activity activity) {
@@ -59,7 +62,6 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
         setShown(message.isReaded());
         setTime(message.getTimeString());
 
-        setDownloading(MessageAPI.hasDownloading(message.getMessage()));
         setURL(message.getUrl());
         setFileName(message.getMessage());
 
@@ -68,37 +70,16 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
 
     private void addHandlers(){
         action.setOnClickListener(v -> {
-            if(isDownloading) {
-                MessageAPI.cancelDownloading(fileName);
-                return;
-            }
+            DownloadManager manager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
+            Uri uri = Uri.parse(url.replace("\\", "/"));
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle(fileName);
+            request.setDescription("Downloading " + fileName);
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setVisibleInDownloadsUi(true);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
 
-            MessageAPI.downloadFile(url, fileName, (e, response) -> {
-                if(e != null || !response.isSuccessful()){
-                    activity.runOnUiThread(() -> {
-                        //get error
-                        String errorText = e != null ? e.getMessage() : "";
-                        errorText = e == null && !response.isSuccessful() ? response.message() : errorText;
-                        Toast.makeText(activity, errorText, Toast.LENGTH_SHORT).show();
-                    });
-                }
-                else{
-                    File saveFile = new File(activity.getCacheDir(), fileName);
-
-                    try {
-                        //save file
-                        BufferedSink sink = Okio.buffer(Okio.sink(saveFile));
-                        sink.writeAll(response.body().source());
-                        activity.runOnUiThread(() -> Toast.makeText(activity, "Downloaded", Toast.LENGTH_SHORT).show());
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-                activity.runOnUiThread(() -> setDownloading(false));
-            });
-
-            setDownloading(true);
+            manager.enqueue(request);
         });
     }
 
@@ -128,10 +109,5 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
 
     private void setShown(boolean isShown){
         check2.setVisibility(isShown ? View.VISIBLE : View.GONE);
-    }
-
-    private void setDownloading(boolean isDownloading){
-        this.isDownloading = isDownloading;
-        actionImg.setImageDrawable(App.getContext().getDrawable(isDownloading ? R.drawable.close : R.drawable.download));
     }
 }
