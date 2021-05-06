@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.adapters.ChatAdapter;
@@ -26,7 +27,9 @@ import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
+import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
 import htmlprogrammer.labs.messanger.viewmodels.chat.ChatMessagesViewModel;
+import htmlprogrammer.labs.messanger.viewmodels.chat.SendMessageViewModel;
 import okhttp3.Response;
 
 /**
@@ -38,7 +41,11 @@ public class MessagesFragment extends Fragment {
     private ChatAdapter adapter;
 
     private ChatMessagesViewModel chatMessagesVM;
+    private SendMessageViewModel sendMessagesVM;
     private ChatMessagesStore chatMessagesStore = ChatMessagesStore.getInstance();
+    private SendMessagesStore sendMessagesStore = SendMessagesStore.getInstance();
+
+    private String dialogID;
 
     public MessagesFragment() {}
 
@@ -52,9 +59,15 @@ public class MessagesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        dialogID = ChatStore.getInstance().getDialog().getId();
+
         chatMessagesVM = ViewModelProviders.of(this).get(ChatMessagesViewModel.class);
+        sendMessagesVM = ViewModelProviders.of(this).get(SendMessageViewModel.class);
+        sendMessagesVM.addHandlerFor(dialogID);
+
         list = view.findViewById(R.id.list);
         fab = view.findViewById(R.id.fab);
+
         adapter = new ChatAdapter(getFragmentManager(), requireActivity());
 
         LinearLayoutManager manager = new LinearLayoutManager(requireContext());
@@ -70,7 +83,17 @@ public class MessagesFragment extends Fragment {
     }
 
     private void addHandlers(){
-        chatMessagesVM.getMessages().observe(this, msg -> adapter.setData(msg));
+        chatMessagesVM.getMessages().observe(this, msg -> {
+            TreeSet<Message> sendMessages = sendMessagesStore.getForDialogID(dialogID);
+            msg.addAll(sendMessages);
+            adapter.setData(msg);
+        });
+
+        sendMessagesVM.getMessages().observe(this, msg -> {
+            TreeSet<Message> curMessages = chatMessagesStore.getMessages();
+            msg.addAll(curMessages);
+            adapter.setData(msg);
+        });
 
         chatMessagesVM.getError().observe(this, err -> {
             if(err != null)

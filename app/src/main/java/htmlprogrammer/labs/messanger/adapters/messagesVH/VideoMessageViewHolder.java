@@ -45,6 +45,7 @@ public class VideoMessageViewHolder extends MessageViewHolder {
         setShown(message.isReaded());
         setTime(message.getTimeString());
         setSize(message.getSize());
+        setSending(message.isSending());
 
         play.setOnClickListener(v -> open());
         videoName.setOnClickListener(v -> open());

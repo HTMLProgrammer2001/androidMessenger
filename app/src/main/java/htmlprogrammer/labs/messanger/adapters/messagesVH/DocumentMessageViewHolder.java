@@ -32,7 +32,6 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
     private TextView documentName;
     private TextView size;
     private FrameLayout action;
-    private ImageView actionImg;
     private ImageView check2;
 
     private String url;
@@ -45,7 +44,6 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
         //find elements
         documentName = itemView.findViewById(R.id.documentName);
         action = itemView.findViewById(R.id.action);
-        actionImg = itemView.findViewById(R.id.actionImg);
         size = itemView.findViewById(R.id.passed);
         name = itemView.findViewById(R.id.name);
         time = itemView.findViewById(R.id.time);
@@ -64,6 +62,7 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
 
         setURL(message.getUrl());
         setFileName(message.getMessage());
+        setSending(message.isSending());
 
         addHandlers();
     }

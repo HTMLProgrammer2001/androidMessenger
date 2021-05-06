@@ -24,6 +24,8 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Date;
+import java.util.Random;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.MessageAPI;
@@ -33,6 +35,7 @@ import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
 import htmlprogrammer.labs.messanger.models.Message;
+import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
 import okhttp3.Response;
 
 /**
@@ -52,6 +55,7 @@ public class TextActionFragment extends Fragment {
     private boolean fileShown = false;
     private MessageTypes type;
     private ChatStore chatStore = ChatStore.getInstance();
+    private SendMessagesStore sendMessagesStore = SendMessagesStore.getInstance();
 
     private final int FILE_REQUEST_CODE = 9000;
 
@@ -95,13 +99,32 @@ public class TextActionFragment extends Fragment {
                 String filePath = FileHelper.getRealPathFromUri(requireActivity(), uri);
                 File file = new File(filePath);
 
+                //create message object for show sending state
+                String url = "file://" + Uri.fromFile(file).toString();
+                Message messageObj = new Message();
+                messageObj.setAuthor(MeStore.getInstance().getUser());
+                messageObj.setUrl(url);
+                messageObj.setDialog(ChatStore.getInstance().getDialog());
+                messageObj.setSending(true);
+                messageObj.setTime(new Date());
+                messageObj.setType(type);
+                messageObj.setMessage(file.getName());
+                messageObj.setSize(file.length());
+                messageObj.setId(String.valueOf(new Random().nextInt()));
+
+                //add it to store
+                sendMessagesStore.addMessage(messageObj);
+
                 //make api call
                 MessageAPI.sendFileMessage(
                         MeStore.getInstance().getToken(),
                         chatStore.getDialog().getId(),
                         type,
                         file,
-                        this::onSent
+                        (err, resp) -> {
+                            sendMessagesStore.deleteMessage(messageObj);
+                            onSent(err, resp);
+                        }
                 );
             }
             catch (Exception e){
@@ -128,17 +151,33 @@ public class TextActionFragment extends Fragment {
         });
 
         send.setOnClickListener(v -> {
-            String message = input.getText().toString();
+            String messageText = input.getText().toString();
 
-            if(message.isEmpty())
+            if(messageText.isEmpty())
                 return;
+
+            //create message object for show sending state
+            Message messageObj = new Message();
+            messageObj.setAuthor(MeStore.getInstance().getUser());
+            messageObj.setMessage(messageText);
+            messageObj.setDialog(ChatStore.getInstance().getDialog());
+            messageObj.setSending(true);
+            messageObj.setTime(new Date());
+            messageObj.setType(MessageTypes.TEXT);
+            messageObj.setId(String.valueOf(new Random().nextInt()));
+
+            //add it to store
+            sendMessagesStore.addMessage(messageObj);
 
             //make api call
             MessageAPI.sendTextMessage(
                     MeStore.getInstance().getToken(),
                     chatStore.getDialog().getId(),
-                    message,
-                    this::onSent
+                    messageText,
+                    (err, resp) -> {
+                        sendMessagesStore.deleteMessage(messageObj);
+                        onSent(err, resp);
+                    }
             );
 
             input.setText("");

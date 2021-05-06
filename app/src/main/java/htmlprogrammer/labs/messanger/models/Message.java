@@ -14,9 +14,10 @@ public class Message implements Comparable<Message> {
     private MessageTypes type;
     private Date time;
     private boolean readed;
+    private boolean isSending = false;
     private Dialog dialog;
     private User author;
-    private int size = 0;
+    private long size = 0;
     private String url = null;
 
     @Override
@@ -123,11 +124,19 @@ public class Message implements Comparable<Message> {
         this.readed = readed;
     }
 
-    public int getSize() {
+    public boolean isSending(){
+        return isSending;
+    }
+
+    public void setSending(boolean sending){
+        this.isSending = sending;
+    }
+
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 

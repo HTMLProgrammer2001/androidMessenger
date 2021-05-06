@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import htmlprogrammer.labs.messanger.App;
@@ -17,11 +18,13 @@ import htmlprogrammer.labs.messanger.models.Message;
 public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
     protected ConstraintLayout group;
     protected TextView date;
+    protected ImageView check;
 
     public MessageViewHolder(@NonNull View itemView) {
         super(itemView);
         group = itemView.findViewById(R.id.group);
         date = itemView.findViewById(R.id.date);
+        check = itemView.findViewById(R.id.check);
     }
 
     protected void setOwn(boolean isOwn){
@@ -36,6 +39,10 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
         DrawableCompat.setTint(bg, ctx.getResources().getColor(isOwn ? R.color.bgMessage : R.color.bgWhite));
 
         group.setBackground(bg);
+    }
+
+    protected void setSending(boolean isSending){
+        check.setImageDrawable(App.getContext().getDrawable(isSending ? R.drawable.sending : R.drawable.check));
     }
 
     public void setDate(String dateStr){

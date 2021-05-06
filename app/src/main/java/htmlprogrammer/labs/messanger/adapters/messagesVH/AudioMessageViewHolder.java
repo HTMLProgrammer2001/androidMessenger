@@ -71,6 +71,7 @@ public class AudioMessageViewHolder extends MessageViewHolder {
         setTime(message.getTimeString());
         setAudioName(message.getMessage());
         setURL(message.getUrl());
+        setSending(message.isSending());
 
         initPlayer();
         addHandlers();
@@ -81,7 +82,7 @@ public class AudioMessageViewHolder extends MessageViewHolder {
     }
 
     private void setURL(String url) {
-        this.url = url;
+        this.url = url.replace("\\", "/");
     }
 
     void setName(String name) {
@@ -98,7 +99,7 @@ public class AudioMessageViewHolder extends MessageViewHolder {
 
     private void addHandlers() {
         action.setOnClickListener(v -> onTogglePlay());
-        mediaPlayer.setOnCompletionListener(mp -> onEnd());
+//        mediaPlayer.setOnCompletionListener(mp -> onEnd());
         duration.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -136,17 +137,17 @@ public class AudioMessageViewHolder extends MessageViewHolder {
         else {
             //preload audio
 //            try {
-////                if(!isPrepared){
-////                    mediaPlayer.setDataSource(url);
-////                    isPrepared = true;
-//                    //mediaPlayer.prepareAsync();
+//                if(!isPrepared){
+//                    mediaPlayer.setDataSource(url);
+//                    isPrepared = true;
+//                    mediaPlayer.prepareAsync();
 //                }
 //            }
 //            catch (Exception e){}
 
             //start play
-            mediaPlayer.start();
-            handler.postDelayed(runnable, 0);
+//            mediaPlayer.start();
+//            handler.postDelayed(runnable, 0);
         }
 
         isPlay = !isPlay;
