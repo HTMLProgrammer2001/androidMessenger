@@ -71,7 +71,7 @@ public class AudioMessageViewHolder extends MessageViewHolder {
         setTime(message.getTimeString());
         setAudioName(message.getMessage());
         setURL(message.getUrl());
-        setSending(message.isSending());
+        setSending(message);
 
         initPlayer();
         addHandlers();

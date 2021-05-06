@@ -10,6 +10,7 @@ import htmlprogrammer.labs.messanger.BuildConfig;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.interfaces.APICallback;
 import htmlprogrammer.labs.messanger.interfaces.ApiClass;
+import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -17,7 +18,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class MessageAPI extends ApiClass {
-    public static void sendTextMessage(String token, String to, String message, APICallback callback){
+    public static void sendTextMessage(String token, String to, String message, String id, APICallback callback){
         JSONObject data = new JSONObject();
 
         try{
@@ -30,6 +31,7 @@ public class MessageAPI extends ApiClass {
             Request request = new Request.Builder().url(BuildConfig.API_URL + "/messages")
                     .addHeader("Authorization", "Bearer " + token)
                     .post(body)
+                    .tag("send:" + id)
                     .build();
 
             makeCall(request, callback);
@@ -37,7 +39,7 @@ public class MessageAPI extends ApiClass {
         catch (Exception e){ }
     }
 
-    public static void sendFileMessage(String token, String to, MessageTypes msgType, File file, APICallback callback){
+    public static void sendFileMessage(String token, String to, MessageTypes msgType, File file, String id, APICallback callback){
         String extension = MimeTypeMap.getFileExtensionFromUrl(file.getPath());
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         String name = file.getName();
@@ -56,9 +58,16 @@ public class MessageAPI extends ApiClass {
                 .url(BuildConfig.API_URL + "/messages")
                 .addHeader("Authorization", "Bearer " + token)
                 .post(body)
+                .tag("send:" + id)
                 .build();
 
         makeCall(request, callback);
+    }
+
+    public static void cancelSend(String id){
+        for(Call call : client.dispatcher().runningCalls())
+            if(call.request().tag().equals("send:" + id))
+                call.cancel();
     }
 
     public static void getMessages(String token, String dialog, int page, int pageSize, APICallback callback){

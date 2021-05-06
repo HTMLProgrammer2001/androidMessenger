@@ -119,8 +119,7 @@ public class TextActionFragment extends Fragment {
                 MessageAPI.sendFileMessage(
                         MeStore.getInstance().getToken(),
                         chatStore.getDialog().getId(),
-                        type,
-                        file,
+                        type, file, messageObj.getId(),
                         (err, resp) -> {
                             sendMessagesStore.deleteMessage(messageObj);
                             onSent(err, resp);
@@ -173,7 +172,7 @@ public class TextActionFragment extends Fragment {
             MessageAPI.sendTextMessage(
                     MeStore.getInstance().getToken(),
                     chatStore.getDialog().getId(),
-                    messageText,
+                    messageText, messageObj.getId(),
                     (err, resp) -> {
                         sendMessagesStore.deleteMessage(messageObj);
                         onSent(err, resp);

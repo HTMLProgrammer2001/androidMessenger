@@ -62,7 +62,7 @@ public class DocumentMessageViewHolder extends MessageViewHolder {
 
         setURL(message.getUrl());
         setFileName(message.getMessage());
-        setSending(message.isSending());
+        setSending(message);
 
         addHandlers();
     }

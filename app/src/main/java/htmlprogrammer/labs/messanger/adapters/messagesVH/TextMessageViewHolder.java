@@ -33,7 +33,7 @@ public class TextMessageViewHolder extends MessageViewHolder {
         setName(message.getAuthor().getFullName());
         setShown(message.isReaded());
         setTime(message.getTimeString());
-        setSending(message.isSending());
+        setSending(message);
     }
 
     void setMessage(String msg){

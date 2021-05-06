@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import htmlprogrammer.labs.messanger.App;
 import htmlprogrammer.labs.messanger.R;
+import htmlprogrammer.labs.messanger.api.MessageAPI;
 import htmlprogrammer.labs.messanger.models.Message;
+import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
 
 public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
     protected ConstraintLayout group;
@@ -41,8 +43,15 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
         group.setBackground(bg);
     }
 
-    protected void setSending(boolean isSending){
-        check.setImageDrawable(App.getContext().getDrawable(isSending ? R.drawable.sending : R.drawable.check));
+    protected void setSending(Message msg){
+        check.setImageDrawable(App.getContext().getDrawable(msg.isSending() ? R.drawable.sending : R.drawable.check));
+
+        if(msg.isSending()) {
+            group.setOnClickListener(v -> {
+                SendMessagesStore.getInstance().deleteMessage(msg);
+                MessageAPI.cancelSend(msg.getId());
+            });
+        }
     }
 
     public void setDate(String dateStr){

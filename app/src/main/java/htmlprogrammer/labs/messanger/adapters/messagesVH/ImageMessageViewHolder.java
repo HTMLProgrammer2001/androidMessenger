@@ -36,7 +36,7 @@ public class ImageMessageViewHolder extends MessageViewHolder {
         setName(message.getAuthor().getFullName());
         setShown(message.isReaded());
         setTime(message.getTimeString());
-        setSending(message.isSending());
+        setSending(message);
 
         img.setOnClickListener(v -> ImageDialog.getInstance(message.getUrl()).show(manager, "Image"));
     }
