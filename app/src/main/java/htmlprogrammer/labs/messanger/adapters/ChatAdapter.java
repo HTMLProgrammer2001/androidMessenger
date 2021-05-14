@@ -24,6 +24,7 @@ import htmlprogrammer.labs.messanger.models.Message;
 
 public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
     private ArrayList<Message> data = new ArrayList<>();
+    private ArrayList<String> selectedIds = new ArrayList<>();
     private FragmentManager manager;
     private Activity activity;
 
@@ -76,6 +77,9 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
         textMessageViewHolder.updateUI(message, manager);
         textMessageViewHolder.setIsRecyclable(false);
 
+        if(selectedIds.contains(message.getId()))
+            textMessageViewHolder.select();
+
         //show date if needed
         if(i == data.size() - 1) {
             textMessageViewHolder.setDate(data.get(i).getDateString());
@@ -109,8 +113,12 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             messages.add((Message) dialog);
         }
 
-        Collections.reverse(messages);
         this.data = messages;
+        this.notifyDataSetChanged();
+    }
+
+    public void setSelectedIds(ArrayList<String> ids){
+        this.selectedIds = ids;
         this.notifyDataSetChanged();
     }
 }

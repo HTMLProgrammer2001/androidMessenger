@@ -29,6 +29,7 @@ import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
 import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
 import htmlprogrammer.labs.messanger.viewmodels.chat.ChatMessagesViewModel;
+import htmlprogrammer.labs.messanger.viewmodels.chat.SelectedMessagesViewModel;
 import htmlprogrammer.labs.messanger.viewmodels.chat.SendMessageViewModel;
 import okhttp3.Response;
 
@@ -42,6 +43,7 @@ public class MessagesFragment extends Fragment {
 
     private ChatMessagesViewModel chatMessagesVM;
     private SendMessageViewModel sendMessagesVM;
+    private SelectedMessagesViewModel selectedMessagesVM;
     private ChatMessagesStore chatMessagesStore = ChatMessagesStore.getInstance();
     private SendMessagesStore sendMessagesStore = SendMessagesStore.getInstance();
 
@@ -62,6 +64,7 @@ public class MessagesFragment extends Fragment {
         dialogID = ChatStore.getInstance().getDialog().getId();
 
         chatMessagesVM = ViewModelProviders.of(this).get(ChatMessagesViewModel.class);
+        selectedMessagesVM = ViewModelProviders.of(requireActivity()).get(SelectedMessagesViewModel.class);
         sendMessagesVM = ViewModelProviders.of(this).get(SendMessageViewModel.class);
         sendMessagesVM.addHandlerFor(dialogID);
 
@@ -83,6 +86,16 @@ public class MessagesFragment extends Fragment {
     }
 
     private void addHandlers(){
+        selectedMessagesVM.getSelectedMessages().observe(this, selectedMsg -> {
+            ArrayList<String> selectedIds = new ArrayList<>();
+
+            for(Message msg : selectedMsg){
+                selectedIds.add(msg.getId());
+            }
+
+            adapter.setSelectedIds(selectedIds);
+        });
+
         chatMessagesVM.getMessages().observe(this, msg -> {
             TreeSet<Message> sendMessages = sendMessagesStore.getForDialogID(dialogID);
             msg.addAll(sendMessages);

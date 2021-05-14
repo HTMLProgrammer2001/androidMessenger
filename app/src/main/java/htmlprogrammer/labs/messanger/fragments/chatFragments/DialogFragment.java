@@ -1,6 +1,7 @@
 package htmlprogrammer.labs.messanger.fragments.chatFragments;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,13 +15,16 @@ import android.widget.TextView;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.adapters.ChatAdapter;
+import htmlprogrammer.labs.messanger.fragments.chatFragments.actions.MessageActionFragment;
 import htmlprogrammer.labs.messanger.fragments.chatFragments.actions.TextActionFragment;
+import htmlprogrammer.labs.messanger.viewmodels.chat.SelectedMessagesViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class DialogFragment extends Fragment {
     private TextView loading;
+    private SelectedMessagesViewModel selectedMessagesVM;
 
     public DialogFragment() {}
 
@@ -35,5 +39,18 @@ public class DialogFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         loading = view.findViewById(R.id.loading);
         loading.setVisibility(View.GONE);
+
+        selectedMessagesVM = ViewModelProviders.of(this).get(SelectedMessagesViewModel.class);
+
+        addHandlers();
+    }
+
+    private void addHandlers(){
+        selectedMessagesVM.getIsSelectMode().observe(this, isSelectMode -> {
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.actionFragment, isSelectMode ? new MessageActionFragment() : new TextActionFragment(), null)
+                    .commit();
+        });
     }
 }

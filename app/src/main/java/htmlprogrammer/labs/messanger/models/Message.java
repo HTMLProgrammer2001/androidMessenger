@@ -2,7 +2,6 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
@@ -25,14 +24,14 @@ public class Message implements Comparable<Message> {
         if (getId().equals(otherMessage.getId()))
             return 0;
 
-        return getTime().compareTo(otherMessage.getTime());
+        return -getTime().compareTo(otherMessage.getTime());
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Dialog) {
-            Dialog otherDialog = (Dialog) obj;
-            return getId().equals(otherDialog.getId());
+        if (obj instanceof Message) {
+            Message otherMessage = (Message) obj;
+            return getId().equals(otherMessage.getId());
         }
 
         return false;

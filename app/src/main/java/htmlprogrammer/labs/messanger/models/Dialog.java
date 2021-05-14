@@ -32,7 +32,7 @@ public class Dialog implements Comparable<Dialog> {
         if (message == null && otherMessage != null)
             return 1;
 
-        return message.getTime().compareTo(otherMessage.getTime());
+        return message.compareTo(otherMessage);
     }
 
     @Override

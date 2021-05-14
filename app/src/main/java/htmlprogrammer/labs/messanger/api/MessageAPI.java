@@ -18,10 +18,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class MessageAPI extends ApiClass {
-    public static void sendTextMessage(String token, String to, String message, String id, APICallback callback){
+    public static void sendTextMessage(String token, String to, String message, String id, APICallback callback) {
         JSONObject data = new JSONObject();
 
-        try{
+        try {
             data.put("dialog", to);
             data.put("message", message);
             data.put("type", MessageTypes.TEXT.getValue());
@@ -35,11 +35,11 @@ public class MessageAPI extends ApiClass {
                     .build();
 
             makeCall(request, callback);
+        } catch (Exception e) {
         }
-        catch (Exception e){ }
     }
 
-    public static void sendFileMessage(String token, String to, MessageTypes msgType, File file, String id, APICallback callback){
+    public static void sendFileMessage(String token, String to, MessageTypes msgType, File file, String id, APICallback callback) {
         String extension = MimeTypeMap.getFileExtensionFromUrl(file.getPath());
         String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         String name = file.getName();
@@ -64,13 +64,13 @@ public class MessageAPI extends ApiClass {
         makeCall(request, callback);
     }
 
-    public static void cancelSend(String id){
-        for(Call call : client.dispatcher().runningCalls())
-            if(call.request().tag().equals("send:" + id))
+    public static void cancelSend(String id) {
+        for (Call call : client.dispatcher().runningCalls())
+            if (call.request().tag().equals("send:" + id))
                 call.cancel();
     }
 
-    public static void getMessages(String token, String dialog, int page, int pageSize, APICallback callback){
+    public static void getMessages(String token, String dialog, int page, int pageSize, APICallback callback) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BuildConfig.API_URL + "/messages/chat/" + dialog).newBuilder();
         urlBuilder.addQueryParameter("pageSize", Integer.toString(pageSize));
         urlBuilder.addQueryParameter("page", Integer.toString(page));
@@ -79,6 +79,23 @@ public class MessageAPI extends ApiClass {
                 .url(urlBuilder.build().toString())
                 .addHeader("Authorization", "Bearer " + token)
                 .get().build();
+
+        makeCall(request, callback);
+    }
+
+    public static void deleteMessages(String token, boolean forOther, String[] messages, APICallback callback) {
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(BuildConfig.API_URL + "/messages").newBuilder();
+
+        for(int i = 0; i < messages.length; i++){
+            urlBuilder.addQueryParameter("messages[" + i + "]", messages[i]);
+        }
+
+        urlBuilder.addQueryParameter("forOthers", Boolean.valueOf(forOther).toString());
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .addHeader("Authorization", "Bearer " + token)
+                .delete().build();
 
         makeCall(request, callback);
     }

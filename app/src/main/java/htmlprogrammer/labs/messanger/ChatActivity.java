@@ -24,6 +24,7 @@ import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
+import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
 import htmlprogrammer.labs.messanger.viewmodels.chat.ChatViewModel;
 import okhttp3.Response;
 
@@ -70,6 +71,13 @@ public class ChatActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //clear selected store
+        SelectedMessagesStore.getInstance().reset();
     }
 
     private void addHandlers(){
