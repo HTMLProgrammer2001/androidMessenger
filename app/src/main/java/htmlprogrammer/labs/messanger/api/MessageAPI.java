@@ -87,7 +87,7 @@ public class MessageAPI extends ApiClass {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BuildConfig.API_URL + "/messages").newBuilder();
 
         for(int i = 0; i < messages.length; i++){
-            urlBuilder.addQueryParameter("messages[" + i + "]", messages[i]);
+            urlBuilder.addEncodedQueryParameter("messages[]", messages[i]);
         }
 
         urlBuilder.addQueryParameter("forOthers", Boolean.valueOf(forOther).toString());

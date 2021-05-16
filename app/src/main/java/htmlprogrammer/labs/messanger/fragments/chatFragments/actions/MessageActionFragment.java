@@ -37,7 +37,8 @@ public class MessageActionFragment extends Fragment {
     private SelectedMessagesStore selectedMessagesStore = SelectedMessagesStore.getInstance();
     private SelectedMessagesViewModel selectedMessagesVM;
 
-    public MessageActionFragment() { }
+    public MessageActionFragment() {
+    }
 
 
     @Override
@@ -62,13 +63,12 @@ public class MessageActionFragment extends Fragment {
         addHandlers();
     }
 
-    private void addHandlers(){
+    private void addHandlers() {
         selectedMessagesVM.getSelectedMessages().observe(this, messages -> {
             //show or hide edit button
-            if(messages.size() == 1 && messages.get(0).getAuthor().getId().equals(meStore.getUser().getId())){
+            if (messages.size() == 1 && messages.get(0).getAuthor().getId().equals(meStore.getUser().getId())) {
                 edit.setVisibility(View.VISIBLE);
-            }
-            else{
+            } else {
                 edit.setVisibility(View.GONE);
             }
         });
@@ -77,35 +77,35 @@ public class MessageActionFragment extends Fragment {
         delete.setOnClickListener(this::onDelete);
     }
 
-    private void onCancel(View v){
+    private void onCancel(View v) {
         selectedMessagesStore.reset();
     }
 
-    private void onDelete(View v){
+    private void onDelete(View v) {
         //check if all messages belongs to current user
         boolean isMyMessages = true;
 
-        for(Message msg : selectedMessagesStore.getSelectedMessages()){
-            if(!msg.getAuthor().getId().equals(meStore.getUser().getId())){
+        for (Message msg : selectedMessagesStore.getSelectedMessages()) {
+            if (!msg.getAuthor().getId().equals(meStore.getUser().getId())) {
                 isMyMessages = false;
                 break;
             }
         }
 
         //show dialog if belongs
-        if(!isMyMessages){
+        if (isMyMessages) {
             DeleteMessagesDialog deleteMessagesDialog = new DeleteMessagesDialog();
             deleteMessagesDialog.show(requireFragmentManager(), "delete");
-        }
-        else {
+            deleteMessagesDialog.setHandler(this::deleteMessages);
+        } else {
             deleteMessages(false);
         }
     }
 
-    private void deleteMessages(boolean forOther){
+    public void deleteMessages(boolean forOther) {
         String[] ids = new String[selectedMessagesStore.getSelectedMessages().size()];
 
-        for(int i = 0; i < selectedMessagesStore.getSelectedMessages().size(); i++){
+        for (int i = 0; i < selectedMessagesStore.getSelectedMessages().size(); i++) {
             ids[i] = selectedMessagesStore.getSelectedMessages().get(i).getId();
         }
 
@@ -119,8 +119,8 @@ public class MessageActionFragment extends Fragment {
         selectedMessagesStore.reset();
     }
 
-    private void onDeleteResponse(Exception e, Response response){
-        if(e != null || !response.isSuccessful()){
+    private void onDeleteResponse(Exception e, Response response) {
+        if (e != null || !response.isSuccessful()) {
             new Handler(Looper.getMainLooper()).post(() -> {
                 //get error
                 String errorText = e != null ? e.getMessage() : "";
@@ -128,8 +128,7 @@ public class MessageActionFragment extends Fragment {
 
                 Toast.makeText(App.getContext(), errorText, Toast.LENGTH_SHORT).show();
             });
-        }
-        else{
+        } else {
             new Handler(Looper.getMainLooper()).post(() -> {
                 Toast.makeText(App.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
             });
