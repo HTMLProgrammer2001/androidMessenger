@@ -20,6 +20,7 @@ import htmlprogrammer.labs.messanger.App;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.MessageAPI;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
+import htmlprogrammer.labs.messanger.helpers.VibrateHelper;
 import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
@@ -31,7 +32,6 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
 
     private Timer timer;
     private Message message;
-    private boolean isPressed = false;
     private boolean isSelected = false;
 
     private SelectedMessagesStore selectedMessagesStore = SelectedMessagesStore.getInstance();
@@ -43,6 +43,8 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
         group = itemView.findViewById(R.id.group);
         date = itemView.findViewById(R.id.date);
         check = itemView.findViewById(R.id.check);
+
+        timer = new Timer();
     }
 
     protected void setOwn(boolean isOwn){
@@ -67,28 +69,27 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
         this.message = msg;
         group.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN){
-                isPressed = true;
-                timer = new Timer();
-
                 //not select sending or special messages
                 if(msg.isSending() || msg.getType().equals(MessageTypes.SPECIAL))
-                    return false;
+                    return true;
 
                 if(isSelected) {
                     //un select
                     selectedMessagesStore.removeMessage(msg);
                 }
                 //start selecting
-                else if(!selectedMessagesStore.isSelectMode())
-                    timer.schedule(new SelectTask(), 500);
+                else if(!selectedMessagesStore.isSelectMode()) {
+                    timer = new Timer();
+                    timer.schedule(new SelectTask(), 2000);
+                }
                 else
-                    timer.schedule(new SelectTask(), 0);
+                    selectedMessagesStore.addMessage(message);
             }
             else if(event.getAction() == MotionEvent.ACTION_UP){
-                isPressed = false;
+                timer.cancel();
             }
 
-            return false;
+            return true;
         });
 
 
@@ -128,8 +129,8 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
     class SelectTask extends TimerTask{
         @Override
         public void run() {
-            if(isPressed)
-                selectedMessagesStore.addMessage(message);
+            VibrateHelper.getInstance().vibrateChoose();
+            selectedMessagesStore.addMessage(message);
         }
     }
 }

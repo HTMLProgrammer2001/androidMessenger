@@ -2,9 +2,11 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 import htmlprogrammer.labs.messanger.constants.DialogTypes;
 
-public class Dialog implements Comparable<Dialog> {
+public class Dialog implements Comparable<Dialog>, Serializable {
     private String id;
     private String name;
     private String nick;

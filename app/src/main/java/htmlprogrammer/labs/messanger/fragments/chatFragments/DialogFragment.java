@@ -46,11 +46,21 @@ public class DialogFragment extends Fragment {
     }
 
     private void addHandlers(){
-        selectedMessagesVM.getIsSelectMode().observe(this, isSelectMode -> {
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.actionFragment, isSelectMode ? new MessageActionFragment() : new TextActionFragment(), null)
-                    .commit();
-        });
+        selectedMessagesVM.getIsSelectMode().observe(this, isSelectMode -> changeActionFragment());
+        selectedMessagesVM.getEditMessage().observe(this, msg -> changeActionFragment());
+    }
+
+    private void changeActionFragment(){
+        Fragment fragment = new MessageActionFragment();
+
+        if(!selectedMessagesVM.getIsSelectMode().getValue())
+            fragment = TextActionFragment.getInstance(null);
+        else if(selectedMessagesVM.getEditMessage().getValue() != null)
+            fragment = TextActionFragment.getInstance(selectedMessagesVM.getEditMessage().getValue());
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.actionFragment, fragment, null)
+                .commit();
     }
 }

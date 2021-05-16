@@ -10,6 +10,7 @@ public class SelectedMessagesStore {
     private static SelectedMessagesStore instance;
 
     private Observable<ArrayList<Message>> selectedMessages = new Observable<>(new ArrayList<>());
+    private Observable<Message> editMessage = new Observable<>(null);
 
     public static SelectedMessagesStore getInstance(){
         if(instance == null)
@@ -20,6 +21,10 @@ public class SelectedMessagesStore {
 
     public ArrayList<Message> getSelectedMessages(){
         return selectedMessages.getState();
+    }
+
+    public Message getEditMessage(){
+        return editMessage.getState();
     }
 
     public void removeMessage(Message msg){
@@ -34,8 +39,16 @@ public class SelectedMessagesStore {
         selectedMessages.notifyObservers(curMessages);
     }
 
+    public void setEditMessage(Message edit){
+        this.editMessage.notifyObservers(edit);
+    }
+
     public void addSelectedObserver(Observer<ArrayList<Message>> observer){
         selectedMessages.addObserver(observer);
+    }
+
+    public void addEditMessageObserver(Observer<Message> observer){
+        editMessage.addObserver(observer);
     }
 
     public boolean isSelectMode(){
@@ -43,6 +56,7 @@ public class SelectedMessagesStore {
     }
 
     public void reset(){
+        editMessage.notifyObservers(null);
         selectedMessages.notifyObservers(new ArrayList<>());
     }
 }

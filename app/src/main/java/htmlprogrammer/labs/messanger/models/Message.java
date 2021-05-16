@@ -2,12 +2,13 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.helpers.DateHelper;
 
-public class Message implements Comparable<Message> {
+public class Message implements Comparable<Message>, Serializable {
     private String id;
     private String message;
     private MessageTypes type;

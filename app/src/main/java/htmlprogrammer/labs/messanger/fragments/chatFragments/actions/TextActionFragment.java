@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
 import htmlprogrammer.labs.messanger.models.Message;
+import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
 import okhttp3.Response;
 
@@ -46,6 +48,9 @@ public class TextActionFragment extends Fragment {
     private ImageView attachment;
     private EditText input;
     private ConstraintLayout fileSelect;
+    private ConstraintLayout editMessage;
+    private TextView editMessageText;
+    private ImageView editMessageCancel;
 
     private FrameLayout document;
     private FrameLayout image;
@@ -56,6 +61,8 @@ public class TextActionFragment extends Fragment {
     private MessageTypes type;
     private ChatStore chatStore = ChatStore.getInstance();
     private SendMessagesStore sendMessagesStore = SendMessagesStore.getInstance();
+    private SelectedMessagesStore selectedMessagesStore = SelectedMessagesStore.getInstance();
+    private Message editMessageObj;
 
     private final int FILE_REQUEST_CODE = 9000;
 
@@ -74,6 +81,9 @@ public class TextActionFragment extends Fragment {
         input = view.findViewById(R.id.input);
         attachment = view.findViewById(R.id.attachment);
         fileSelect = view.findViewById(R.id.fileSelect);
+        editMessage = view.findViewById(R.id.editMessage);
+        editMessageText = view.findViewById(R.id.message);
+        editMessageCancel = view.findViewById(R.id.cancel);
 
         audio = view.findViewById(R.id.audio);
         video = view.findViewById(R.id.video);
@@ -84,6 +94,7 @@ public class TextActionFragment extends Fragment {
         fileSelect.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
         fileSelect.setVisibility(View.GONE);
 
+        initEdit();
         addHandlers();
     }
 
@@ -116,15 +127,7 @@ public class TextActionFragment extends Fragment {
                 sendMessagesStore.addMessage(messageObj);
 
                 //make api call
-                MessageAPI.sendFileMessage(
-                        MeStore.getInstance().getToken(),
-                        chatStore.getDialog().getId(),
-                        type, file, messageObj.getId(),
-                        (err, resp) -> {
-                            sendMessagesStore.deleteMessage(messageObj);
-                            onSent(err, resp);
-                        }
-                );
+                sendFileMessage(messageObj, file);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -132,11 +135,39 @@ public class TextActionFragment extends Fragment {
         }
     }
 
+    private void initEdit(){
+        editMessageObj = (Message) getArguments().getSerializable("editMessage");
+
+        //hide if no edit message
+        if(editMessageObj == null) {
+            editMessage.setVisibility(View.GONE);
+            return;
+        }
+
+        //show edit message data
+        editMessageText.setText(editMessageObj.getMessage());
+
+        if(editMessageObj.getType().equals(MessageTypes.TEXT))
+            input.setText(editMessageObj.getMessage());
+    }
+
+    public static TextActionFragment getInstance(Message msg){
+        TextActionFragment fragment = new TextActionFragment();
+        Bundle args = new Bundle();
+
+        args.putSerializable("editMessage", msg);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     private void addHandlers(){
         audio.setOnClickListener(v -> openFile("audio/*", MessageTypes.AUDIO));
         video.setOnClickListener(v -> openFile("video/*", MessageTypes.VIDEO));
         image.setOnClickListener(v -> openFile("image/*", MessageTypes.IMAGE));
         document.setOnClickListener(v -> openFile("*/*", MessageTypes.DOCUMENT));
+
+        editMessageCancel.setOnClickListener(v -> selectedMessagesStore.reset());
 
         attachment.setOnClickListener(v -> {
             //toggle ui
@@ -150,6 +181,7 @@ public class TextActionFragment extends Fragment {
         });
 
         send.setOnClickListener(v -> {
+            selectedMessagesStore.reset();
             String messageText = input.getText().toString();
 
             if(messageText.isEmpty())
@@ -169,15 +201,7 @@ public class TextActionFragment extends Fragment {
             sendMessagesStore.addMessage(messageObj);
 
             //make api call
-            MessageAPI.sendTextMessage(
-                    MeStore.getInstance().getToken(),
-                    chatStore.getDialog().getId(),
-                    messageText, messageObj.getId(),
-                    (err, resp) -> {
-                        sendMessagesStore.deleteMessage(messageObj);
-                        onSent(err, resp);
-                    }
-            );
+            sendTextMessage(messageObj);
 
             input.setText("");
         });
@@ -202,6 +226,60 @@ public class TextActionFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void sendTextMessage(Message msg){
+        if(editMessageObj == null) {
+            //send new text message
+            MessageAPI.sendTextMessage(
+                    MeStore.getInstance().getToken(),
+                    chatStore.getDialog().getId(),
+                    msg.getMessage(), msg.getId(),
+                    (err, resp) -> {
+                        sendMessagesStore.deleteMessage(msg);
+                        onSent(err, resp);
+                    }
+            );
+        }
+        else{
+            //edit text message
+            MessageAPI.editTextMessage(
+                    MeStore.getInstance().getToken(),
+                    editMessageObj.getId(),
+                    msg.getMessage(), msg.getId(),
+                    (err, resp) -> {
+                        sendMessagesStore.deleteMessage(msg);
+                        onSent(err, resp);
+                    }
+            );
+        }
+    }
+
+    private void sendFileMessage(Message message, File file){
+        if(editMessageObj == null){
+            MessageAPI.sendFileMessage(
+                    MeStore.getInstance().getToken(),
+                    chatStore.getDialog().getId(),
+                    type, file, message.getId(),
+                    (err, resp) -> {
+                        sendMessagesStore.deleteMessage(message);
+                        onSent(err, resp);
+                    }
+            );
+        }
+        else{
+            MessageAPI.editFileMessage(
+                    MeStore.getInstance().getToken(),
+                    editMessageObj.getId(),
+                    message.getType(),
+                    file,
+                    message.getId(),
+                    (err, resp) -> {
+                        sendMessagesStore.deleteMessage(message);
+                        onSent(err, resp);
+                    }
+            );
+        }
     }
 
     private void openFile(String type, MessageTypes msgType){

@@ -37,8 +37,7 @@ public class MessageActionFragment extends Fragment {
     private SelectedMessagesStore selectedMessagesStore = SelectedMessagesStore.getInstance();
     private SelectedMessagesViewModel selectedMessagesVM;
 
-    public MessageActionFragment() {
-    }
+    public MessageActionFragment() {}
 
 
     @Override
@@ -75,10 +74,15 @@ public class MessageActionFragment extends Fragment {
 
         cancel.setOnClickListener(this::onCancel);
         delete.setOnClickListener(this::onDelete);
+        edit.setOnClickListener(this::onEdit);
     }
 
     private void onCancel(View v) {
         selectedMessagesStore.reset();
+    }
+
+    private void onEdit(View v){
+        selectedMessagesStore.setEditMessage(selectedMessagesStore.getSelectedMessages().get(0));
     }
 
     private void onDelete(View v) {

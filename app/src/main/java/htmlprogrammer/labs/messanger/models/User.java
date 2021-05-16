@@ -2,11 +2,12 @@ package htmlprogrammer.labs.messanger.models;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import htmlprogrammer.labs.messanger.helpers.DateHelper;
 
-public class User {
+public class User implements Serializable {
     private String id;
     private String avatar;
     private String fullName = "";
