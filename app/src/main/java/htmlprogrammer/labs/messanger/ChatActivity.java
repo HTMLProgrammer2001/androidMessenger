@@ -87,6 +87,9 @@ public class ChatActivity extends AppCompatActivity {
                 Intent userIntent = new Intent(this, UserInfoActivity.class);
                 userIntent.putExtra("userNick", chatStore.getUser().getNick());
 
+                if(chatStore.getDialog() != null)
+                    userIntent.putExtra("dialogID", chatStore.getDialog().getId());
+
                 startActivity(userIntent);
             }
             else if(chatStore.getDialog() != null){

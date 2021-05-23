@@ -82,4 +82,7 @@
     <string name="edit">Edit</string>
     <string name="resend">Resend</string>
     <string name="deleteForOther">Delete for other</string>
+    <string name="selectFriends">Select friends</string>
+    <string name="friendName">Friend name</string>
+    <string name="unknownType">Unknown message type</string>
 </resources>

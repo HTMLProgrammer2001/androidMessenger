@@ -24,7 +24,7 @@ android {
         }
 
         debug {
-            buildConfigField "String", "API_URL", '"http://192.168.0.99:5000"'
+            buildConfigField "String", "API_URL", '"http://192.168.0.150:5000"'
 //            buildConfigField "String", "API_URL", '"https://messanger.click/api"'
             buildConfigField "String", "SMS_SENDER", '"Messanger"'
         }
@@ -50,4 +50,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.7.3'
+    implementation ('io.socket:socket.io-client:2.0.0'){
+        exclude group: 'org.json', module: 'json'
+    }
 }

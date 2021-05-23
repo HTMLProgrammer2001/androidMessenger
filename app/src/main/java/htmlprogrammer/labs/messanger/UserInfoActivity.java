@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +48,9 @@ public class UserInfoActivity extends AppCompatActivity {
         userInfoVM = ViewModelProviders.of(this).get(UserInfoViewModel.class);
         userAvatar = UserAvatar.getInstance("", "");
         String userNick = getIntent().getStringExtra("userNick");
+        String userDialogID = getIntent().getStringExtra("dialogID");
+
+        userInfoVM.setDialogID(userDialogID);
 
         //find elements
         back = findViewById(R.id.back);
@@ -68,42 +72,12 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private void addHandlers(){
         back.setOnClickListener(v -> finish());
+        message.setOnClickListener(v -> onMessage());
+        ban.setOnClickListener(v -> onBan());
+        clear.setOnClickListener(v -> onClear());
 
-        message.setOnClickListener(v -> {
-            User user = userInfoVM.getUser().getValue();
-
-            if(user != null){
-                //show user chat
-                Intent intent = new Intent(this, ChatActivity.class);
-                intent.putExtra("nick", user.getNick());
-                startActivity(intent);
-            }
-            else
-                finish();
-        });
-
-        ban.setOnClickListener(v -> {
-            User user = userInfoVM.getUser().getValue();
-
-            if(user != null && !isBanLoading){
-                ban.setTextColor(getResources().getColor(R.color.textGray));
-                isBanLoading = true;
-
-                String id = userInfoVM.getUser().getValue().getId();
-                ChatAPI.ban(MeStore.getInstance().getToken(), id, this::onBanResult);
-            }
-        });
-
-        clear.setOnClickListener(v -> {
-            User user = userInfoVM.getUser().getValue();
-
-            if(user != null && !isClearLoading){
-                clear.setTextColor(getResources().getColor(R.color.textGray));
-                isClearLoading = true;
-
-                String id = userInfoVM.getUser().getValue().getId();
-                ChatAPI.clear(MeStore.getInstance().getToken(), id, this::onClearResult);
-            }
+        userInfoVM.getDialogID().observe(this, dialogID -> {
+            clear.setVisibility(dialogID == null ? View.GONE : View.VISIBLE);
         });
 
         userInfoVM.getUser().observe(this, user -> {
@@ -125,6 +99,31 @@ public class UserInfoActivity extends AppCompatActivity {
             description.setText(descriptionStr);
             ban.setText(user.isBanned() ? R.string.unban : R.string.ban);
         });
+    }
+
+    private void onMessage(){
+        User user = userInfoVM.getUser().getValue();
+
+        if(user != null){
+            //show user chat
+            Intent intent = new Intent(this, ChatActivity.class);
+            intent.putExtra("nick", user.getNick());
+            startActivity(intent);
+        }
+        else
+            finish();
+    }
+
+    private void onBan(){
+        User user = userInfoVM.getUser().getValue();
+
+        if(user != null && !isBanLoading){
+            ban.setTextColor(getResources().getColor(R.color.textGray));
+            isBanLoading = true;
+
+            String id = userInfoVM.getUser().getValue().getId();
+            ChatAPI.ban(MeStore.getInstance().getToken(), id, this::onBanResult);
+        }
     }
 
     private void onBanResult(Exception e, Response response){
@@ -161,6 +160,18 @@ public class UserInfoActivity extends AppCompatActivity {
             } catch (Exception err) {
                 err.printStackTrace();
             }
+        }
+    }
+
+    private void onClear(){
+        User user = userInfoVM.getUser().getValue();
+
+        if(user != null && !isClearLoading){
+            clear.setTextColor(getResources().getColor(R.color.textGray));
+            isClearLoading = true;
+
+            String id = userInfoVM.getDialogID().getValue();
+            ChatAPI.clear(MeStore.getInstance().getToken(), id, this::onClearResult);
         }
     }
 

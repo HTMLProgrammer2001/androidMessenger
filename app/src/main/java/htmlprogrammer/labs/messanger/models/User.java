@@ -7,7 +7,7 @@ import java.util.Date;
 
 import htmlprogrammer.labs.messanger.helpers.DateHelper;
 
-public class User implements Serializable {
+public class User implements Serializable, Comparable<User> {
     private String id;
     private String avatar;
     private String fullName = "";
@@ -121,5 +121,14 @@ public class User implements Serializable {
          catch (Exception e){}
 
          return user;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        if (getId().equals(o.getId()))
+            return 0;
+
+        int compName = getFullName().compareTo(o.getFullName());
+        return compName == 0 ? getId().compareTo(o.getId()) : compName;
     }
 }

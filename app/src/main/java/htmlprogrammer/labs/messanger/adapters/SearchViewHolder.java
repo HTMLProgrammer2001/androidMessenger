@@ -23,7 +23,6 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
 
     SearchViewHolder(AppCompatActivity ctx, View view){
         super(view);
-
         this.ctx = ctx;
 
         try {
@@ -69,6 +68,10 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
                 .beginTransaction()
                 .replace(id, avatarFragment, null)
                 .commit();
+    }
+
+    void setSelected(boolean isSelected){
+        this.root.setBackgroundColor(ctx.getResources().getColor(isSelected ? R.color.bgBlue : R.color.bgWhite));
     }
 
     void setOnClick(View.OnClickListener listener){

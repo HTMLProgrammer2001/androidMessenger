@@ -16,6 +16,7 @@ import htmlprogrammer.labs.messanger.adapters.messagesVH.DocumentMessageViewHold
 import htmlprogrammer.labs.messanger.adapters.messagesVH.ImageMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.SpecialMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.TextMessageViewHolder;
+import htmlprogrammer.labs.messanger.adapters.messagesVH.UnknownMessageViewHolder;
 import htmlprogrammer.labs.messanger.adapters.messagesVH.VideoMessageViewHolder;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.interfaces.MessageViewHolder;
@@ -47,7 +48,9 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             Message message = data.get(i);
 
             //show messages by type
-            if(message.getType().equals(MessageTypes.IMAGE))
+            if(message.getType().equals(MessageTypes.TEXT))
+                holder = new TextMessageViewHolder(inflater.inflate(R.layout.text_message_layout, viewGroup, false));
+            else if(message.getType().equals(MessageTypes.IMAGE))
                 holder = new ImageMessageViewHolder(inflater.inflate(R.layout.image_message_layout, viewGroup, false));
             else if(message.getType().equals(MessageTypes.VIDEO))
                 holder = new VideoMessageViewHolder(inflater.inflate(R.layout.video_message_layout, viewGroup, false));
@@ -61,7 +64,7 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             else if(message.getType().equals(MessageTypes.SPECIAL))
                 holder = new SpecialMessageViewHolder(inflater.inflate(R.layout.special_message_layout, viewGroup, false));
             else
-                holder = new TextMessageViewHolder(inflater.inflate(R.layout.text_message_layout, viewGroup, false));
+                holder = new UnknownMessageViewHolder(inflater.inflate(R.layout.unknown_message_layout, viewGroup, false));
         }
 
         return holder;

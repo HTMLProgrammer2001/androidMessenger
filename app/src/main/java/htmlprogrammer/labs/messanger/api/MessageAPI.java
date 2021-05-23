@@ -2,9 +2,11 @@ package htmlprogrammer.labs.messanger.api;
 
 import android.webkit.MimeTypeMap;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import htmlprogrammer.labs.messanger.BuildConfig;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
@@ -140,5 +142,23 @@ public class MessageAPI extends ApiClass {
                 .build();
 
         makeCall(request, callback);
+    }
+
+    public static void resend(String token, String[] to, String[] messages, APICallback callback){
+        JSONObject data = new JSONObject();
+
+        try {
+            data.put("to", new JSONArray(to));
+            data.put("messages", new JSONArray(messages));
+
+            RequestBody body = RequestBody.create(JSON, data.toString());
+
+            Request request = new Request.Builder().url(BuildConfig.API_URL + "/messages/resend")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .post(body)
+                    .build();
+
+            makeCall(request, callback);
+        } catch (Exception e) {}
     }
 }

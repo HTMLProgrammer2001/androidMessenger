@@ -14,10 +14,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 import htmlprogrammer.labs.messanger.App;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.MessageAPI;
 import htmlprogrammer.labs.messanger.dialogs.DeleteMessagesDialog;
+import htmlprogrammer.labs.messanger.dialogs.FriendsList;
 import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
@@ -75,6 +79,7 @@ public class MessageActionFragment extends Fragment {
         cancel.setOnClickListener(this::onCancel);
         delete.setOnClickListener(this::onDelete);
         edit.setOnClickListener(this::onEdit);
+        resend.setOnClickListener(this::onResend);
     }
 
     private void onCancel(View v) {
@@ -135,6 +140,45 @@ public class MessageActionFragment extends Fragment {
         } else {
             new Handler(Looper.getMainLooper()).post(() -> {
                 Toast.makeText(App.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+            });
+        }
+    }
+
+    private void onResend(View v){
+        FriendsList friendsList = new FriendsList();
+        friendsList.setCallback(this::resend);
+        friendsList.show(requireFragmentManager(), "friends");
+    }
+
+    private void resend(ArrayList<String> to){
+        ArrayList<Message> messages = selectedMessagesStore.getSelectedMessages();
+        ArrayList<String> messageIds = new ArrayList<>();
+
+        for(Message msg : messages)
+            messageIds.add(msg.getId());
+
+        selectedMessagesStore.reset();
+
+        MessageAPI.resend(
+                MeStore.getInstance().getToken(),
+                to.toArray(new String[]{""}),
+                messageIds.toArray(new String[]{""}),
+                this::onResendResponse
+        );
+    }
+
+    private void onResendResponse(Exception err, Response response){
+        if (err != null || !response.isSuccessful()) {
+            new Handler(Looper.getMainLooper()).post(() -> {
+                //get error
+                String errorText = err != null ? err.getMessage() : "";
+                errorText = err == null && !response.isSuccessful() ? response.message() : errorText;
+
+                Toast.makeText(App.getContext(), errorText, Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            new Handler(Looper.getMainLooper()).post(() -> {
+                Toast.makeText(App.getContext(), "Resend", Toast.LENGTH_SHORT).show();
             });
         }
     }

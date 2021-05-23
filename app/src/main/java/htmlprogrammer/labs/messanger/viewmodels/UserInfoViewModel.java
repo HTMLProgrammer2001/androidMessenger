@@ -7,6 +7,7 @@ import htmlprogrammer.labs.messanger.models.User;
 
 public class UserInfoViewModel extends ViewModel {
     private MutableLiveData<User> user = new MutableLiveData<>();
+    private MutableLiveData<String> dialogID = new MutableLiveData<>();
 
     public MutableLiveData<User> getUser(){
         return user;
@@ -14,5 +15,13 @@ public class UserInfoViewModel extends ViewModel {
 
     public void setUser(User newUser){
         user.postValue(newUser);
+    }
+
+    public MutableLiveData<String> getDialogID(){
+        return dialogID;
+    }
+
+    public void setDialogID(String newDialog){
+        dialogID.postValue(newDialog);
     }
 }
