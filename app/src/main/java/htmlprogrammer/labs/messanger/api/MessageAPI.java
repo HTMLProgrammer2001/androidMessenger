@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import htmlprogrammer.labs.messanger.BuildConfig;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
@@ -87,8 +86,8 @@ public class MessageAPI extends ApiClass {
     public static void deleteMessages(String token, boolean forOther, String[] messages, APICallback callback) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(BuildConfig.API_URL + "/messages").newBuilder();
 
-        for(int i = 0; i < messages.length; i++){
-            urlBuilder.addEncodedQueryParameter("messages[]", messages[i]);
+        for (String message : messages) {
+            urlBuilder.addEncodedQueryParameter("messages[]", message);
         }
 
         urlBuilder.addQueryParameter("forOthers", Boolean.valueOf(forOther).toString());

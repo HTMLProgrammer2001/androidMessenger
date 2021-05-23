@@ -25,7 +25,8 @@ public class Message implements Comparable<Message>, Serializable {
         if (getId().equals(otherMessage.getId()))
             return 0;
 
-        return -getTime().compareTo(otherMessage.getTime());
+        int comp = -getTime().compareTo(otherMessage.getTime());
+        return comp == 0 ? getId().compareTo(otherMessage.getId()) : comp;
     }
 
     @Override

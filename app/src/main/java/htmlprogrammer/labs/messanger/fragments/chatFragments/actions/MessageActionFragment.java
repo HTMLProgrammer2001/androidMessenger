@@ -14,14 +14,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import htmlprogrammer.labs.messanger.App;
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.MessageAPI;
 import htmlprogrammer.labs.messanger.dialogs.DeleteMessagesDialog;
-import htmlprogrammer.labs.messanger.dialogs.FriendsList;
+import htmlprogrammer.labs.messanger.dialogs.ResendDialogList;
 import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
@@ -145,9 +144,9 @@ public class MessageActionFragment extends Fragment {
     }
 
     private void onResend(View v){
-        FriendsList friendsList = new FriendsList();
-        friendsList.setCallback(this::resend);
-        friendsList.show(requireFragmentManager(), "friends");
+        ResendDialogList resendDialogList = new ResendDialogList();
+        resendDialogList.setCallback(this::resend);
+        resendDialogList.show(requireFragmentManager(), "friends");
     }
 
     private void resend(ArrayList<String> to){

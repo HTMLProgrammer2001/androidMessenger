@@ -12,10 +12,10 @@ import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.interfaces.IFriendListContext;
-import htmlprogrammer.labs.messanger.models.User;
+import htmlprogrammer.labs.messanger.models.Dialog;
 
-public class FriendListAdapter extends RecyclerView.Adapter<SearchViewHolder> {
-    private ArrayList<User> data = new ArrayList<>();
+public class ResendDialogListAdapter extends RecyclerView.Adapter<SearchViewHolder> {
+    private ArrayList<Dialog> data = new ArrayList<>();
     private ArrayList<String> selected = new ArrayList<>();
     private LayoutInflater inflater;
     private AppCompatActivity ctx;
@@ -24,7 +24,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     private static int EMPTY_TYPE = 0;
     private static int LIST_TYPE = 1;
 
-    public FriendListAdapter(AppCompatActivity ctx, IFriendListContext dialogCtx){
+    public ResendDialogListAdapter(AppCompatActivity ctx, IFriendListContext dialogCtx){
         inflater = LayoutInflater.from(ctx);
         this.ctx = ctx;
         this.dialogCtx = dialogCtx;
@@ -48,13 +48,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder friendListVH, int i) {
         if(data.size() > 0 && data.size() != i){
-            User user = data.get(i);
-            friendListVH.showName(user.getFullName());
-            friendListVH.showMessage("@" + user.getNick());
+            Dialog dialog = data.get(i);
+            friendListVH.showName(dialog.getName());
             //friendListVH.showAvatar(user.getFullName(), user.getAvatar());
 
-            friendListVH.showTime("");
-            friendListVH.setOnClick(v -> dialogCtx.toggleSelect(user.getId()));
+            if(dialog.getMessage() != null) {
+                friendListVH.showMessage(dialog.getMessage().getMessage());
+                friendListVH.showTime(dialog.getMessage().getDateTimeString());
+            }
+
+            friendListVH.setOnClick(v -> dialogCtx.toggleSelect(dialog.getId()));
             friendListVH.setSelected(false);
 
             if(selected.contains(data.get(i).getId()))
@@ -77,15 +80,15 @@ public class FriendListAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         return Math.max(data.size(), 1);
     }
 
-    public void setUsers(TreeSet<User> data){
+    public void setDialogs(TreeSet<Dialog> data){
         Object[] arr = data.toArray();
-        ArrayList<User> users = new ArrayList<>();
+        ArrayList<Dialog> dialogs = new ArrayList<>();
 
         for(Object user : arr){
-            users.add((User) user);
+            dialogs.add((Dialog) user);
         }
 
-        this.data = users;
+        this.data = dialogs;
         this.notifyDataSetChanged();
     }
 

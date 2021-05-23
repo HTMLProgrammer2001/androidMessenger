@@ -48,7 +48,9 @@ public class ChatAdapter extends RecyclerView.Adapter<MessageViewHolder> {
             Message message = data.get(i);
 
             //show messages by type
-            if(message.getType().equals(MessageTypes.TEXT))
+            if(message.getType() == null)
+                holder = new UnknownMessageViewHolder(inflater.inflate(R.layout.unknown_message_layout, viewGroup, false));
+            else if(message.getType().equals(MessageTypes.TEXT))
                 holder = new TextMessageViewHolder(inflater.inflate(R.layout.text_message_layout, viewGroup, false));
             else if(message.getType().equals(MessageTypes.IMAGE))
                 holder = new ImageMessageViewHolder(inflater.inflate(R.layout.image_message_layout, viewGroup, false));
