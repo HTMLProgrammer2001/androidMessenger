@@ -33,6 +33,7 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
     private Timer timer;
     private Message message;
     private boolean isSelected = false;
+    private boolean isSelectable = true;
 
     private SelectedMessagesStore selectedMessagesStore = SelectedMessagesStore.getInstance();
 
@@ -70,7 +71,7 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
         group.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN){
                 //not select sending or special messages
-                if(msg.isSending() || msg.getType().equals(MessageTypes.SPECIAL))
+                if(msg.isSending() || msg.getType().equals(MessageTypes.SPECIAL) || !isSelectable)
                     return true;
 
                 if(isSelected) {
@@ -122,6 +123,10 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
         DrawableCompat.setTint(bg, App.getContext().getResources().getColor(R.color.bgBlue));
 
         group.setBackground(bg);
+    }
+
+    public void setSelectable(boolean isSelectable){
+        this.isSelectable = isSelectable;
     }
 
     abstract public void updateUI(Message message, FragmentManager manager);

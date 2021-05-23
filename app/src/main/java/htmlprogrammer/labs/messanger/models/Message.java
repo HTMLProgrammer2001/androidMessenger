@@ -1,8 +1,10 @@
 package htmlprogrammer.labs.messanger.models;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
@@ -19,6 +21,7 @@ public class Message implements Comparable<Message>, Serializable {
     private User author;
     private long size = 0;
     private String url = null;
+    private ArrayList<Message> resend = new ArrayList<>();
 
     @Override
     public int compareTo(Message otherMessage) {
@@ -59,6 +62,16 @@ public class Message implements Comparable<Message>, Serializable {
 
             if(obj.optJSONObject("dialog") != null)
                 message.setDialog(Dialog.fromJSON(obj.optJSONObject("dialog"), false));
+
+            if(obj.optJSONArray("resend") != null){
+                ArrayList<Message> resend = new ArrayList<>();
+                JSONArray resendObj = obj.getJSONArray("resend");
+
+                for(int i = 0; i < resendObj.length(); i++)
+                    resend.add(Message.fromJSON(resendObj.getJSONObject(i)));
+
+                message.setResend(resend);
+            }
         }
         catch (Exception e){}
 
@@ -155,5 +168,13 @@ public class Message implements Comparable<Message>, Serializable {
 
     public void setDialog(Dialog dialog) {
         this.dialog = dialog;
+    }
+
+    public ArrayList<Message> getResend(){
+        return resend;
+    }
+
+    public void setResend(ArrayList<Message> resend){
+        this.resend = resend;
     }
 }
