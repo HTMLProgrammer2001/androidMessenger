@@ -85,4 +85,5 @@
     <string name="selectFriends">Select friends</string>
     <string name="friendName">Friend name</string>
     <string name="unknownType">Unknown message type</string>
+    <string name="permissionNotGranted">Permission not granted</string>
 </resources>

@@ -112,8 +112,8 @@ public class User implements Serializable, Comparable<User> {
              user.setFullName(obj.getString("name"));
              user.setNick(obj.getString("nickname"));
              user.setPhone(obj.getString("phone"));
-             user.setBanned(obj.getBoolean("isBanned"));
              user.setOnline(obj.getBoolean("isOnline"));
+             user.setBanned(obj.optBoolean("isBanned", false));
              user.setAvatar(obj.optString("avatar", ""));
              user.setDescription(obj.optString("description", ""));
              user.parseLastSeen(obj.getString("lastSeen"));

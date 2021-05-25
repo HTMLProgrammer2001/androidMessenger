@@ -7,10 +7,18 @@ import android.provider.MediaStore;
 
 public class FileHelper {
     public static String getRealPathFromUri(Activity activity, Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = activity.managedQuery(contentUri, proj, null, null, null);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
+        String result;
+        Cursor cursor = activity.getContentResolver().query(contentUri, null, null, null, null);
+
+        if(cursor == null)
+            result = contentUri.getPath();
+        else{
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+
+        return result;
     }
 }

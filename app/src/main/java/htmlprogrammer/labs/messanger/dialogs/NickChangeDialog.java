@@ -50,8 +50,7 @@ public class NickChangeDialog extends DialogFragment {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((v) -> {
             if(validation.validate() && !isLoading){
                 //change nick
-                String token = requireActivity().getSharedPreferences("store", 0)
-                        .getString("token", "");
+                String token = MeStore.getInstance().getToken();;
 
                 isLoading = true;
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.textGray));

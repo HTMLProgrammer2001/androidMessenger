@@ -1,12 +1,17 @@
 package htmlprogrammer.labs.messanger;
 
+import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +60,7 @@ public class SettingsActivity extends BaseActivity {
     private ActionBar bar;
 
     private final static int PHOTO_CODE = 1000;
+    private final static int PERM_CODE = 101;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,6 +131,25 @@ public class SettingsActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode != PERM_CODE)
+            return;
+
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            onPermGranted();
+        else
+            Toast.makeText(this, getString(R.string.permissionNotGranted), Toast.LENGTH_SHORT).show();
+    }
+
+    private void onPermGranted(){
+        //open image
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        startActivityForResult(intent, PHOTO_CODE);
     }
 
     private void addHandlers(){
@@ -219,10 +244,17 @@ public class SettingsActivity extends BaseActivity {
     }
 
     private void uploadPhoto(View view){
-        //open image
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, PHOTO_CODE);
+        //request read storage
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            int perm = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+            if (perm == PackageManager.PERMISSION_GRANTED)
+                onPermGranted();
+            else
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERM_CODE);
+        }
+        else
+            onPermGranted();
     }
 
     private void onPhotoChanged(Exception e, Response response){

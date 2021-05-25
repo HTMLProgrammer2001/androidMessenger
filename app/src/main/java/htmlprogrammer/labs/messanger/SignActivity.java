@@ -1,12 +1,15 @@
 package htmlprogrammer.labs.messanger;
 
-import android.arch.lifecycle.ViewModelProviders;
+import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
@@ -29,7 +32,6 @@ import htmlprogrammer.labs.messanger.interfaces.BaseActivity;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.receivers.CodeReceiver;
 import htmlprogrammer.labs.messanger.store.MeStore;
-import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import okhttp3.Response;
 
 public class SignActivity extends BaseActivity {
@@ -45,6 +47,9 @@ public class SignActivity extends BaseActivity {
     private CodeReceiver receiver;
 
     private boolean isLoading = false;
+    private boolean receiverRegistered = false;
+
+    private final int PERM_CODE = 101;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,15 +74,44 @@ public class SignActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+
+        //request sms read and receive permission
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            int perm1 = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
+            int perm2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
+
+            if (perm1 == PackageManager.PERMISSION_GRANTED && perm2 == PackageManager.PERMISSION_GRANTED)
+                onPermissionGranted();
+            else
+                requestPermissions(new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, PERM_CODE);
+        }
+        else
+            onPermissionGranted();
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        if(receiver != null)
+        if(receiverRegistered) {
             unregisterReceiver(receiver);
+            receiverRegistered = false;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode != PERM_CODE)
+            return;
+
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            onPermissionGranted();
+        }
+    }
+
+    private void onPermissionGranted(){
+        registerReceiver(this.receiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+        receiverRegistered = true;
     }
 
     private void createCodeInput(){

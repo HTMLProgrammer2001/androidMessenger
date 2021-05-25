@@ -1,16 +1,20 @@
 package htmlprogrammer.labs.messanger.fragments.chatFragments.actions;
 
 
+import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -65,6 +69,7 @@ public class TextActionFragment extends Fragment {
     private Message editMessageObj;
 
     private final int FILE_REQUEST_CODE = 9000;
+    private final int PERM_CODE = 101;
 
     public TextActionFragment() { }
 
@@ -282,11 +287,26 @@ public class TextActionFragment extends Fragment {
         }
     }
 
-    private void openFile(String type, MessageTypes msgType){
+    private void openFile(String strType, MessageTypes msgType){
         this.type = msgType;
 
+        //request read storage
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            int perm = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE);
+
+            if (perm == PackageManager.PERMISSION_GRANTED)
+                onPermissionGranted(strType);
+            else
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_SMS}, PERM_CODE);
+        }
+        else
+            onPermissionGranted(strType);
+    }
+
+    private void onPermissionGranted(String strType){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType(type);
+        intent.setType(strType);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         startActivityForResult(intent, FILE_REQUEST_CODE);
