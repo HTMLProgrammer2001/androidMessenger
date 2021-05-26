@@ -2,7 +2,11 @@ package htmlprogrammer.labs.messanger.constants;
 
 public enum WSEvents {
     NEW_MESSAGE("newMessage"),
-    ONLINE("online");
+    DELETE_MESSAGE("deleteMessage"),
+    UPDATE_MESSAGE("updateMessage"),
+    NEW_DIALOG("newDialog"),
+    ONLINE("online"),
+    OFFLINE("offline");
 
     private String value;
 

@@ -1,6 +1,7 @@
 package htmlprogrammer.labs.messanger.store.search;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.interfaces.Observable;
@@ -39,6 +40,32 @@ public class SearchMessagesStore {
         TreeSet<Message> curMessages = messages.getState();
         curMessages.addAll(newMessages);
         messages.notifyObservers(curMessages);
+    }
+
+    public void deleteMessageById(String msgID){
+        TreeSet<Message> curMessages = messages.getState();
+        Iterator<Message> it = curMessages.iterator();
+
+        //iterate through all elements
+        while (it.hasNext()){
+            Message msg = it.next();
+
+            //if match then delete and notify others
+            if(msg.getId().equals(msgID)) {
+                it.remove();
+                messages.notifyObservers(curMessages);
+                break;
+            }
+        }
+    }
+
+    public void updateMessage(Message updatedMsg){
+        TreeSet<Message> curMessages = messages.getState();
+
+        if(curMessages.remove(updatedMsg)) {
+            curMessages.add(updatedMsg);
+            messages.notifyObservers(curMessages);
+        }
     }
 
     public void setMessages(ArrayList<Message> newMessages){
