@@ -1,6 +1,8 @@
 package htmlprogrammer.labs.messanger.store.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
 
 import htmlprogrammer.labs.messanger.interfaces.Observable;
@@ -35,10 +37,15 @@ public class SearchDialogsStore {
         totalPages = 1;
     }
 
-    public void addDialogs(ArrayList<Dialog> newDialogs){
+    public void addDialogs(List<Dialog> newDialogs){
         TreeSet<Dialog> curDialogs = dialogs.getState();
+        curDialogs.removeAll(newDialogs);
         curDialogs.addAll(newDialogs);
         dialogs.notifyObservers(curDialogs);
+    }
+
+    public void addDialog(Dialog newDialog){
+        addDialogs(Arrays.asList(newDialog));
     }
 
     public void setDialogs(ArrayList<Dialog> newDialogs){

@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,6 +37,7 @@ import htmlprogrammer.labs.messanger.store.search.SearchStore;
 import htmlprogrammer.labs.messanger.store.search.SearchUserStore;
 import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 import htmlprogrammer.labs.messanger.viewmodels.search.SearchViewModel;
+import htmlprogrammer.labs.messanger.websockets.Websocket;
 import okhttp3.Response;
 
 public class DialogsActivity extends BaseActivity{
@@ -84,6 +86,7 @@ public class DialogsActivity extends BaseActivity{
 
         subscribe();
         startDialogsLoading();
+        connectWebsocket();
     }
 
     @Override
@@ -144,6 +147,15 @@ public class DialogsActivity extends BaseActivity{
             toggleSidebar();
 
         return true;
+    }
+
+    private void connectWebsocket(){
+        try {
+            Websocket.connect(MeStore.getInstance().getToken());
+        }
+        catch (Exception err){
+            Toast.makeText(this, getString(R.string.errorWebsocket), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void openDialog(String nick){

@@ -72,7 +72,7 @@ public abstract class MessageViewHolder extends RecyclerView.ViewHolder {
             if(event.getAction() == MotionEvent.ACTION_DOWN){
                 //not select sending or special messages
                 if(msg.isSending() || msg.getType().equals(MessageTypes.SPECIAL) || !isSelectable)
-                    return true;
+                    return false;
 
                 if(isSelected) {
                     //un select

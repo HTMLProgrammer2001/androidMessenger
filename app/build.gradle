@@ -20,11 +20,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_URL", '"https://messanger.click/api"'
+            buildConfigField "String", "WS_URL", '"https://messanger.click/api"'
             buildConfigField "String", "SMS_SENDER", '"Messanger"'
         }
 
         debug {
             buildConfigField "String", "API_URL", '"http://192.168.0.99:5000"'
+            buildConfigField "String", "WS_URL", '"http://192.168.0.99:5000"'
 //            buildConfigField "String", "API_URL", '"https://messanger.click/api"'
             buildConfigField "String", "SMS_SENDER", '"Messanger"'
         }

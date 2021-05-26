@@ -86,4 +86,5 @@
     <string name="friendName">Friend name</string>
     <string name="unknownType">Unknown message type</string>
     <string name="permissionNotGranted">Permission not granted</string>
+    <string name="errorWebsocket">Error while connecting to websocket</string>
 </resources>
