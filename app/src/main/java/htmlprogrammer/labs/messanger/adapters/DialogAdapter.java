@@ -56,6 +56,7 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
             dialogViewHolder.showName(dialog.getName());
             dialogViewHolder.showAvatar(dialog.getName(), dialog.getAvatar());
             dialogViewHolder.showUnread(dialog.getUnread());
+            dialogViewHolder.setOnline(dialog.isOnline());
 
             Message message = dialog.getMessage();
 

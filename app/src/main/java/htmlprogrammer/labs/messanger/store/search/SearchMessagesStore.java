@@ -73,6 +73,27 @@ public class SearchMessagesStore {
         messages.notifyObservers(messagesSet);
     }
 
+    public void updateUserOnline(String userID, boolean isOnline){
+        TreeSet<Message> curMessages = messages.getState();
+        Iterator<Message> it = curMessages.iterator();
+
+        while (it.hasNext()){
+            Message msg = it.next();
+
+            //find messages of this author
+            if(msg.getAuthor().getId().equals(userID)){
+                //change message
+                msg.getAuthor().setOnline(isOnline);
+
+                //change arr
+                it.remove();
+                curMessages.add(msg);
+
+                messages.notifyObservers(curMessages);
+            }
+        }
+    }
+
     public int getPageSize() {
         return pageSize;
     }

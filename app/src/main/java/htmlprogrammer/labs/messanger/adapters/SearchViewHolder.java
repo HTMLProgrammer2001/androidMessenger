@@ -17,6 +17,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
     private TextView unread;
     private FrameLayout avatar;
     private ConstraintLayout root;
+    private View online;
     private int id;
 
     private AppCompatActivity ctx;
@@ -32,6 +33,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
             this.time = view.findViewById(R.id.time);
             this.unread = view.findViewById(R.id.unread);
             this.avatar = view.findViewById(R.id.dialogAvatar);
+            this.online = view.findViewById(R.id.online);
             this.id = View.generateViewId();
 
             this.avatar.setId(id);
@@ -68,6 +70,10 @@ class SearchViewHolder extends RecyclerView.ViewHolder{
                 .beginTransaction()
                 .replace(id, avatarFragment, null)
                 .commit();
+    }
+
+    void setOnline(boolean isOnline){
+        online.setVisibility(isOnline ? View.VISIBLE : View.INVISIBLE);
     }
 
     void setSelected(boolean isSelected){

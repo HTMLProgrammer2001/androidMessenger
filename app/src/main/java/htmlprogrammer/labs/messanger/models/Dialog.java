@@ -16,6 +16,7 @@ public class Dialog implements Comparable<Dialog>, Serializable {
     private int partCount;
     private DialogTypes type;
     private boolean isActive = true;
+    private boolean isOnline = false;
     private String user;
 
     @Override
@@ -31,7 +32,7 @@ public class Dialog implements Comparable<Dialog>, Serializable {
         if (message != null && otherMessage == null)
             return -1;
 
-        if (message == null && otherMessage != null)
+        if (message == null)
             return 1;
 
         return message.compareTo(otherMessage);
@@ -66,8 +67,9 @@ public class Dialog implements Comparable<Dialog>, Serializable {
             dialog.setUnread(obj.getInt("unread"));
             dialog.setPartCount(obj.getInt("partCount"));
             dialog.setType(DialogTypes.fromInt(obj.getInt("type")));
-            dialog.setAvatar(obj.optString("avatar", null));
             dialog.setActive(obj.getBoolean("isActive"));
+            dialog.setAvatar(obj.optString("avatar", null));
+            dialog.setOnline(obj.optBoolean("isOnline", false));
 
             if (obj.optJSONObject("lastMessage") != null && withMessage) {
                 dialog.setMessage(Message.fromJSON(obj.getJSONObject("lastMessage")));
@@ -85,6 +87,14 @@ public class Dialog implements Comparable<Dialog>, Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
     }
 
     public String getName() {

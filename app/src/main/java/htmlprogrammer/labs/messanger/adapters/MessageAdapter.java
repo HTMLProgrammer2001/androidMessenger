@@ -56,6 +56,7 @@ public class MessageAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 
             dialogViewHolder.showTime(message.getDateTimeString());
             dialogViewHolder.showMessage(message.getMessage());
+            dialogViewHolder.setOnline(message.getAuthor().isOnline());
 
             dialogViewHolder.setOnClick(v -> ctx.openDialog(message.getDialog().getNick()));
         }
