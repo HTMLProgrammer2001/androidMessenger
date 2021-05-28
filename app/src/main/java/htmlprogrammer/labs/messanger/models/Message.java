@@ -55,7 +55,7 @@ public class Message implements Comparable<Message>, Serializable {
             message.setMessage(obj.getString("message"));
             message.setType(MessageTypes.fromInt(obj.getInt("type")));
             message.setTime(DateHelper.parseDate(obj.getString("time")));
-            message.setReaded(obj.optBoolean("readed", false));
+            message.setReaded(obj.optInt("readed", 0) == 1);
             message.setSize(obj.optInt("size", 0));
             message.setUrl(obj.optString("url", null));
             message.setAuthor(User.fromJSON(obj.getJSONObject("author")));

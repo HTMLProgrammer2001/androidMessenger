@@ -97,6 +97,7 @@ public class MessagesFragment extends Fragment {
 
             adapter.setData(msg);
         });
+
         loadMore.setOnClickListener((view) -> activity.startMessagesLoading());
     }
 }

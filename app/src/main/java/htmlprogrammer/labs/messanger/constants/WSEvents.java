@@ -7,7 +7,8 @@ public enum WSEvents {
     NEW_DIALOG("newDialog"),
     ONLINE("online"),
     OFFLINE("offline"),
-    TOGGLE_BAN("toggleBan");
+    TOGGLE_BAN("toggleBan"),
+    VIEW_MESSAGES("viewMessages");
 
     private String value;
 

@@ -78,6 +78,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onDestroy();
         //clear selected store
         SelectedMessagesStore.getInstance().reset();
+        ChatStore.getInstance().reset();
     }
 
     private void addHandlers(){

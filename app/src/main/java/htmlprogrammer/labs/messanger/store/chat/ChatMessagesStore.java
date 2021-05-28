@@ -74,6 +74,20 @@ public class ChatMessagesStore {
         messages.notifyObservers(curMessages);
     }
 
+    public Message readMessage(String id){
+        TreeSet<Message> curMessages = messages.getState();
+
+        for(Message msg : curMessages){
+            if(msg.getId().equals(id)){
+                msg.setReaded(true);
+                messages.notifyObservers(curMessages);
+                return msg;
+            }
+        }
+
+        return null;
+    }
+
     public void setMessages(ArrayList<Message> newMessages){
         TreeSet<Message> messagesSet = new TreeSet<>(newMessages);
         messages.notifyObservers(messagesSet);

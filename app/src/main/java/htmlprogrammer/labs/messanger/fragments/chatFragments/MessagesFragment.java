@@ -31,6 +31,7 @@ import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
 import htmlprogrammer.labs.messanger.viewmodels.chat.ChatMessagesViewModel;
 import htmlprogrammer.labs.messanger.viewmodels.chat.SelectedMessagesViewModel;
 import htmlprogrammer.labs.messanger.viewmodels.chat.SendMessageViewModel;
+import htmlprogrammer.labs.messanger.websockets.Websocket;
 import okhttp3.Response;
 
 /**
@@ -162,15 +163,22 @@ public class MessagesFragment extends Fragment {
                 JSONArray array = object.getJSONArray("data");
 
                 ArrayList<Message> newMessages = new ArrayList<>();
+                ArrayList<String> viewMessages = new ArrayList<>();
 
                 for(int i = 0; i < array.length(); i++){
-                    newMessages.add(Message.fromJSON(array.getJSONObject(i)));
+                    Message msg = Message.fromJSON(array.getJSONObject(i));
+                    newMessages.add(msg);
+
+                    if(!msg.isReaded() && !msg.getAuthor().getId().equals(MeStore.getInstance().getUser().getId()))
+                        viewMessages.add(msg.getId());
                 }
 
                 //add it to state
                 chatMessagesStore.setCurPage(object.getInt("page"));
                 chatMessagesStore.setTotalPages(object.getInt("totalPages"));
                 chatMessagesStore.addMessages(newMessages);
+
+                Websocket.viewMessages(viewMessages);
             } catch (Exception e) {
                 e.printStackTrace();
             }
