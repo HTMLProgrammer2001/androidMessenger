@@ -68,6 +68,12 @@ public class ChatMessagesStore {
         }
     }
 
+    public void removeMessages(ArrayList<Message> deleteMessages){
+        TreeSet<Message> curMessages = messages.getState();
+        curMessages.removeAll(deleteMessages);
+        messages.notifyObservers(curMessages);
+    }
+
     public void setMessages(ArrayList<Message> newMessages){
         TreeSet<Message> messagesSet = new TreeSet<>(newMessages);
         messages.notifyObservers(messagesSet);

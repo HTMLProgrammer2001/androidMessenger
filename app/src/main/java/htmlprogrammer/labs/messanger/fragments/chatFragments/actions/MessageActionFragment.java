@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import htmlprogrammer.labs.messanger.App;
@@ -23,6 +24,7 @@ import htmlprogrammer.labs.messanger.dialogs.DeleteMessagesDialog;
 import htmlprogrammer.labs.messanger.dialogs.ResendDialogList;
 import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
 import htmlprogrammer.labs.messanger.viewmodels.chat.SelectedMessagesViewModel;
 import okhttp3.Response;
@@ -38,9 +40,13 @@ public class MessageActionFragment extends Fragment {
 
     private MeStore meStore = MeStore.getInstance();
     private SelectedMessagesStore selectedMessagesStore = SelectedMessagesStore.getInstance();
+    private ChatMessagesStore chatMessagesStore = ChatMessagesStore.getInstance();
     private SelectedMessagesViewModel selectedMessagesVM;
 
-    public MessageActionFragment() {}
+    private ArrayList<Message> deletingMessages;
+
+    public MessageActionFragment() {
+    }
 
 
     @Override
@@ -85,7 +91,7 @@ public class MessageActionFragment extends Fragment {
         selectedMessagesStore.reset();
     }
 
-    private void onEdit(View v){
+    private void onEdit(View v) {
         selectedMessagesStore.setEditMessage(selectedMessagesStore.getSelectedMessages().get(0));
     }
 
@@ -93,7 +99,10 @@ public class MessageActionFragment extends Fragment {
         //check if all messages belongs to current user
         boolean isMyMessages = true;
 
-        for (Message msg : selectedMessagesStore.getSelectedMessages()) {
+        //set deleting messages
+        deletingMessages = selectedMessagesStore.getSelectedMessages();
+
+        for (Message msg : deletingMessages) {
             if (!msg.getAuthor().getId().equals(meStore.getUser().getId())) {
                 isMyMessages = false;
                 break;
@@ -139,21 +148,24 @@ public class MessageActionFragment extends Fragment {
         } else {
             new Handler(Looper.getMainLooper()).post(() -> {
                 Toast.makeText(App.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+
+                //update store
+                chatMessagesStore.removeMessages(deletingMessages);
             });
         }
     }
 
-    private void onResend(View v){
+    private void onResend(View v) {
         ResendDialogList resendDialogList = new ResendDialogList();
         resendDialogList.setCallback(this::resend);
         resendDialogList.show(requireFragmentManager(), "friends");
     }
 
-    private void resend(ArrayList<String> to){
+    private void resend(ArrayList<String> to) {
         ArrayList<Message> messages = selectedMessagesStore.getSelectedMessages();
         ArrayList<String> messageIds = new ArrayList<>();
 
-        for(Message msg : messages)
+        for (Message msg : messages)
             messageIds.add(msg.getId());
 
         selectedMessagesStore.reset();
@@ -166,7 +178,7 @@ public class MessageActionFragment extends Fragment {
         );
     }
 
-    private void onResendResponse(Exception err, Response response){
+    private void onResendResponse(Exception err, Response response) {
         if (err != null || !response.isSuccessful()) {
             new Handler(Looper.getMainLooper()).post(() -> {
                 //get error

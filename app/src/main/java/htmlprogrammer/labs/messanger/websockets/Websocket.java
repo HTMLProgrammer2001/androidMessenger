@@ -3,7 +3,6 @@ package htmlprogrammer.labs.messanger.websockets;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-import java.util.Date;
 
 import htmlprogrammer.labs.messanger.BuildConfig;
 import htmlprogrammer.labs.messanger.constants.WSEvents;
@@ -87,6 +86,20 @@ public class Websocket {
 
         socket.on(WSEvents.ONLINE.getValue(), args -> setOnlineStatus((String) args[0], true));
         socket.on(WSEvents.OFFLINE.getValue(), args -> setOnlineStatus((String) args[0], false));
+
+        socket.on(WSEvents.TOGGLE_BAN.getValue(), args -> {
+           ChatStore chatStore = ChatStore.getInstance();
+
+           String toggleBanForUser = (String) args[0];
+
+           //update store
+           User chatUser = chatStore.getUser();
+           Dialog chatDialog = chatStore.getDialog();
+           if(chatUser != null && chatUser.getId().equals(toggleBanForUser)){
+               chatDialog.setActive(!chatDialog.isActive());
+               chatStore.setDialog(chatDialog);
+           }
+        });
 
         socket.on("error", args -> socket.connect());
     }

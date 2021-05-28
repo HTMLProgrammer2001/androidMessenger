@@ -17,6 +17,8 @@ import htmlprogrammer.labs.messanger.api.SearchAPI;
 import htmlprogrammer.labs.messanger.fragments.UserAvatar;
 import htmlprogrammer.labs.messanger.models.User;
 import htmlprogrammer.labs.messanger.store.MeStore;
+import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
+import htmlprogrammer.labs.messanger.store.chat.ChatStore;
 import htmlprogrammer.labs.messanger.viewmodels.UserInfoViewModel;
 import okhttp3.Response;
 
@@ -31,6 +33,8 @@ public class UserInfoActivity extends AppCompatActivity {
     private TextView description;
     private FrameLayout message;
 
+    private ChatStore chatStore = ChatStore.getInstance();
+    private ChatMessagesStore chatMessagesStore = ChatMessagesStore.getInstance();
     private UserInfoViewModel userInfoVM;
     private UserAvatar userAvatar;
 
@@ -192,6 +196,12 @@ public class UserInfoActivity extends AppCompatActivity {
             try {
                 //show message
                 runOnUiThread(() -> Toast.makeText(this, "Cleared", Toast.LENGTH_SHORT).show());
+
+                //clear store
+                User chatUser = chatStore.getUser();
+
+                if(chatUser != null && chatUser.getId().equals(userInfoVM.getUser().getValue().getId()))
+                    chatMessagesStore.reset();
             } catch (Exception err) {
                 err.printStackTrace();
             }
