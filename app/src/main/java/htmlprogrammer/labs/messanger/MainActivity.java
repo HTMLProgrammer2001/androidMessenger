@@ -11,6 +11,7 @@ import htmlprogrammer.labs.messanger.fragments.Loader;
 import htmlprogrammer.labs.messanger.helpers.LanguageHelper;
 import htmlprogrammer.labs.messanger.interfaces.BaseActivity;
 import htmlprogrammer.labs.messanger.models.User;
+import htmlprogrammer.labs.messanger.services.NotificationService;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.viewmodels.MeViewModel;
 

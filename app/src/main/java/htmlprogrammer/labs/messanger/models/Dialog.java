@@ -18,6 +18,7 @@ public class Dialog implements Comparable<Dialog>, Serializable {
     private boolean isActive = true;
     private boolean isOnline = false;
     private String user;
+    private String status = "";
 
     @Override
     public int compareTo(Dialog otherDialog) {
@@ -25,6 +26,9 @@ public class Dialog implements Comparable<Dialog>, Serializable {
 
         if (getId().equals(otherDialog.getId()))
             return 0;
+
+        if(!status.equals("") || !otherDialog.getStatus().equals(""))
+            return -status.compareTo(otherDialog.getStatus());
 
         if (message == null && otherMessage == null)
             return getId().compareTo(otherDialog.getId());
@@ -167,5 +171,13 @@ public class Dialog implements Comparable<Dialog>, Serializable {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

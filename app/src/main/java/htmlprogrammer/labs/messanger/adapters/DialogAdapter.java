@@ -71,6 +71,9 @@ public class DialogAdapter extends RecyclerView.Adapter<SearchViewHolder> {
                 dialogViewHolder.showMessage(ctx.getString(R.string.messagesDeleted));
             }
 
+            if(!dialog.getStatus().equals(""))
+                dialogViewHolder.showMessage(dialog.getStatus());
+
             dialogViewHolder.setOnClick(v -> ctx.openDialog(dialog.getNick()));
         }
     }

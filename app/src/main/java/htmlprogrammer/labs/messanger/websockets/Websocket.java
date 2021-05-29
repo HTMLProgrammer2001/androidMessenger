@@ -1,16 +1,20 @@
 package htmlprogrammer.labs.messanger.websockets;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.List;
 
 import htmlprogrammer.labs.messanger.BuildConfig;
+import htmlprogrammer.labs.messanger.constants.DialogStatus;
 import htmlprogrammer.labs.messanger.constants.WSEvents;
 import htmlprogrammer.labs.messanger.websockets.listeners.ChangeOnlineListener;
 import htmlprogrammer.labs.messanger.websockets.listeners.DeleteMessageListener;
 import htmlprogrammer.labs.messanger.websockets.listeners.NewDialogListener;
 import htmlprogrammer.labs.messanger.websockets.listeners.NewMessageListener;
+import htmlprogrammer.labs.messanger.websockets.listeners.SetStatusListener;
 import htmlprogrammer.labs.messanger.websockets.listeners.ToggleBanListener;
 import htmlprogrammer.labs.messanger.websockets.listeners.UpdateMessageListener;
 import htmlprogrammer.labs.messanger.websockets.listeners.ViewMessagesListener;
@@ -38,6 +42,7 @@ public class Websocket {
         socket.on(WSEvents.ONLINE.getValue(), new ChangeOnlineListener(true));
         socket.on(WSEvents.OFFLINE.getValue(), new ChangeOnlineListener(false));
         socket.on(WSEvents.VIEW_MESSAGES.getValue(), new ViewMessagesListener());
+        socket.on(WSEvents.SET_STATUS.getValue(), new SetStatusListener());
 
         socket.on("error", args -> socket.connect());
     }
@@ -45,5 +50,18 @@ public class Websocket {
     public static void viewMessages(List<String> msgIds){
         socket.emit(WSEvents.VIEW_MESSAGES.getValue(), new JSONArray(msgIds));
         new ViewMessagesListener().call(new JSONArray(msgIds));
+    }
+
+    public static void sendStatus(String dlgID, DialogStatus status){
+        try {
+            JSONObject data = new JSONObject();
+            data.put("dialog", dlgID);
+            data.put("status", status.getValue());
+
+            socket.emit(WSEvents.CHANGE_DIALOG_STATUS.getValue(), data);
+        }
+         catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

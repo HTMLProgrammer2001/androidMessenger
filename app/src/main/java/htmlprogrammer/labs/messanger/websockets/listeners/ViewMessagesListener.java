@@ -29,6 +29,10 @@ public class ViewMessagesListener implements Emitter.Listener {
 
                 //update unreaded count in search
                 Dialog dlg = msg.getDialog();
+
+                if(dlg == null)
+                    continue;
+
                 dlg.setUnread(Math.max(dlg.getUnread() - 1, 0));
                 searchDialogsStore.addDialog(dlg);
             }

@@ -30,6 +30,7 @@ import htmlprogrammer.labs.messanger.interfaces.BaseActivity;
 import htmlprogrammer.labs.messanger.models.Dialog;
 import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.models.User;
+import htmlprogrammer.labs.messanger.services.NotificationService;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.search.SearchDialogsStore;
 import htmlprogrammer.labs.messanger.store.search.SearchMessagesStore;
@@ -87,6 +88,12 @@ public class DialogsActivity extends BaseActivity{
         subscribe();
         startDialogsLoading();
         connectWebsocket();
+        startNotification();
+    }
+
+    private void startNotification(){
+        Intent notificationService = new Intent(this, NotificationService.class);
+        startService(notificationService);
     }
 
     @Override

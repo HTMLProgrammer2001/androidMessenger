@@ -39,6 +39,8 @@ public class ChatActivity extends AppCompatActivity {
     private ImageView back;
     private ConstraintLayout data;
 
+    private boolean isDialog = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,23 +106,10 @@ public class ChatActivity extends AppCompatActivity {
 
         back.setOnClickListener(v -> finish());
 
-        chatVM.getDialogData().observe(this, dialog -> {
-            if(dialog == null) {
-                User user = chatStore.getUser();
-
-                if(user != null)
-                    replaceFragment(NoDialogFragment.getInstance(user.getId(), user.getNick()));
-
-                return;
-            }
-
-            if(dialog.getType().equals(DialogTypes.CHAT))
-                initUI(dialog.getName(), dialog.getAvatar(), getString(R.string.participants, dialog.getPartCount()));
-
-            if(!dialog.isActive())
-                replaceFragment(new BannedFragment());
-            else
-                replaceFragment(new DialogFragment());
+        chatVM.getLoadingData().observe(this, isLoading -> {
+            //show loader
+            if(isLoading)
+                replaceFragment(new Loader());
         });
 
         chatVM.getUserData().observe(this, user -> {
@@ -132,10 +121,45 @@ public class ChatActivity extends AppCompatActivity {
             initUI(user.getFullName(), user.getAvatar(), info);
         });
 
-        chatVM.getLoadingData().observe(this, isLoading -> {
-            //show loader
-            if(isLoading)
-                replaceFragment(new Loader());
+        chatVM.getDialogData().observe(this, dialog -> {
+            if(dialog == null) {
+                User user = chatStore.getUser();
+
+                if(user != null)
+                    replaceFragment(NoDialogFragment.getInstance(user.getId(), user.getNick()));
+
+                return;
+            }
+
+            if(dialog.getType().equals(DialogTypes.CHAT)) {
+                //show participants or status
+                String info = getString(R.string.participants, dialog.getPartCount());
+
+                if(!dialog.getStatus().equals(""))
+                    info = dialog.getStatus();
+
+                initUI(dialog.getName(), dialog.getAvatar(), info);
+            }
+            else if(dialog.getType().equals(DialogTypes.PERSONAL)){
+                //show last seen or status
+                String info = dialog.getStatus();
+                User chatUser = chatVM.getUserData().getValue();
+
+                if(info.equals("") && chatUser != null)
+                    info = chatUser.isOnline() ? getString(R.string.online) : getString(R.string.lastSeen, chatUser.getDateTimeString());
+
+                if(chatUser != null)
+                    initUI(chatUser.getFullName(), chatUser.getAvatar(), info);
+            }
+
+            if(!dialog.isActive() && isDialog) {
+                replaceFragment(new BannedFragment());
+                isDialog = false;
+            }
+            else if(dialog.isActive() && !isDialog) {
+                replaceFragment(new DialogFragment());
+                isDialog = true;
+            }
         });
     }
 

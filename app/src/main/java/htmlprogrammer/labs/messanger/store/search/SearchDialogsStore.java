@@ -2,7 +2,6 @@ package htmlprogrammer.labs.messanger.store.search;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -41,21 +40,16 @@ public class SearchDialogsStore {
 
     public void deleteLastMessage(String msgID) {
         TreeSet<Dialog> curDialogs = dialogs.getState();
-        Iterator<Dialog> it = curDialogs.iterator();
 
         //iterate through all elements
-        while (it.hasNext()) {
-            Dialog dialog = it.next();
-
+        for (Dialog dialog : curDialogs) {
             //if match then delete and notify others
-            if(dialog.getMessage() != null){
+            if (dialog.getMessage() != null) {
                 if (dialog.getMessage().getId().equals(msgID)) {
                     //delete message
                     dialog.setMessage(null);
 
                     //update store
-                    curDialogs.remove(dialog);
-                    curDialogs.add(dialog);
                     dialogs.notifyObservers(curDialogs);
                     break;
                 }
@@ -65,21 +59,16 @@ public class SearchDialogsStore {
 
     public void updateLastMessage(Message msg){
         TreeSet<Dialog> curDialogs = dialogs.getState();
-        Iterator<Dialog> it = curDialogs.iterator();
 
         //iterate through all elements
-        while (it.hasNext()) {
-            Dialog dialog = it.next();
-
+        for (Dialog dialog : curDialogs) {
             //if match then delete and notify others
-            if(dialog.getMessage() != null){
+            if (dialog.getMessage() != null) {
                 if (dialog.getMessage().getId().equals(msg.getId())) {
                     //delete message
                     dialog.setMessage(msg);
 
                     //update store
-                    curDialogs.remove(dialog);
-                    curDialogs.add(dialog);
                     dialogs.notifyObservers(curDialogs);
                     break;
                 }
@@ -89,20 +78,25 @@ public class SearchDialogsStore {
 
     public void updateUserOnline(String userID, boolean isOnline){
         TreeSet<Dialog> curDialogs = dialogs.getState();
-        Iterator<Dialog> it = curDialogs.iterator();
 
-        while (it.hasNext()){
-            Dialog dialog = it.next();
-
-            if(dialog.getUser() != null && dialog.getUser().equals(userID)){
+        for (Dialog dialog : curDialogs) {
+            if (dialog.getUser() != null && dialog.getUser().equals(userID)) {
                 //update dialog
                 dialog.setOnline(isOnline);
-
-                //change arr
-                it.remove();
-                curDialogs.add(dialog);
-
                 dialogs.notifyObservers(curDialogs);
+            }
+        }
+    }
+
+    public void updateStatus(String dlgID, String status){
+        TreeSet<Dialog> curDialogs = dialogs.getState();
+
+        for (Dialog dialog : curDialogs) {
+            if (dialog.getId().equals(dlgID)) {
+                //update dialog
+                dialog.setStatus(status);
+                dialogs.notifyObservers(curDialogs);
+                return;
             }
         }
     }

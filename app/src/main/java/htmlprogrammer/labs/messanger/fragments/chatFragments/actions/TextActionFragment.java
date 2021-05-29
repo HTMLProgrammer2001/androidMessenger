@@ -31,17 +31,22 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.Date;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import htmlprogrammer.labs.messanger.R;
 import htmlprogrammer.labs.messanger.api.MessageAPI;
+import htmlprogrammer.labs.messanger.constants.DialogStatus;
 import htmlprogrammer.labs.messanger.constants.MessageTypes;
 import htmlprogrammer.labs.messanger.helpers.FileHelper;
+import htmlprogrammer.labs.messanger.models.Dialog;
+import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.MeStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.ChatStore;
-import htmlprogrammer.labs.messanger.models.Message;
 import htmlprogrammer.labs.messanger.store.chat.SelectedMessagesStore;
 import htmlprogrammer.labs.messanger.store.chat.SendMessagesStore;
+import htmlprogrammer.labs.messanger.websockets.Websocket;
 import okhttp3.Response;
 
 /**
@@ -61,6 +66,7 @@ public class TextActionFragment extends Fragment {
     private FrameLayout audio;
     private FrameLayout video;
 
+    private Timer sendFileTimer;
     private boolean fileShown = false;
     private MessageTypes type;
     private ChatStore chatStore = ChatStore.getInstance();
@@ -99,6 +105,8 @@ public class TextActionFragment extends Fragment {
         fileSelect.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
         fileSelect.setVisibility(View.GONE);
 
+        sendFileTimer = new Timer();
+
         initEdit();
         addHandlers();
     }
@@ -133,6 +141,16 @@ public class TextActionFragment extends Fragment {
 
                 //make api call
                 sendFileMessage(messageObj, file);
+
+                //change ws
+                Websocket.sendStatus(ChatStore.getInstance().getDialog().getId(), DialogStatus.fromMessageType(type));
+
+                sendFileTimer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Websocket.sendStatus(ChatStore.getInstance().getDialog().getId(), DialogStatus.fromMessageType(type));
+                    }
+                }, 0, 1000);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -226,6 +244,9 @@ public class TextActionFragment extends Fragment {
                 //change size
                 int lines = s.toString().split("\n").length;
                 input.setLines(Math.min(lines, 3));
+
+                //change dialog status
+                Websocket.sendStatus(chatStore.getDialog().getId(), DialogStatus.MESSAGE);
             }
 
             @Override
@@ -297,7 +318,7 @@ public class TextActionFragment extends Fragment {
             if (perm == PackageManager.PERMISSION_GRANTED)
                 onPermissionGranted(strType);
             else
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_SMS}, PERM_CODE);
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERM_CODE);
         }
         else
             onPermissionGranted(strType);
@@ -318,6 +339,7 @@ public class TextActionFragment extends Fragment {
 
         //stop loading
         chatStore.stopLoading();
+        sendFileTimer.cancel();
 
         if(e != null || !response.isSuccessful()){
             requireActivity().runOnUiThread(() -> {
